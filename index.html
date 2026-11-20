@@ -1,1430 +1,391 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>สถานีบริการน้ำมันยุค 1920s | ค้นหาปั๊มใกล้ฉัน</title>
-    
-    <!-- PWA & Mobile Web App Meta Tags สำหรับการแสดงผลเต็มจอเหมือนแอปมือถือ -->
-    <meta name="theme-color" content="#121110">
-    <meta name="background-color" content="#121110">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ปั๊มใกล้ฉัน 20s">
-    <link id="pwa-manifest" rel="manifest" href="">
-    <link id="apple-touch-icon" rel="apple-touch-icon" href="">
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Cinzel Decorative, Prompt, Charmonman & Sarabun สำหรับกลิ่นอาย Art Deco ผสมภาษาไทยคลาสสิก -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Charmonman:wght@700&family=Cinzel+Decorative:wght@700;900&family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        decoBlack: '#121110',
-                        decoDark: '#1C1A17',
-                        decoGold: '#D4AF37',
-                        decoGoldLight: '#F3E5AB',
-                        decoGoldDark: '#997A15',
-                        decoCream: '#F4EFE6',
-                        decoPaper: '#EAE0CE',
-                        decoCrimson: '#8B0000',
-                        decoCrimsonLight: '#B22222',
-                    },
-                    fontFamily: {
-                        deco: ['"Cinzel Decorative"', 'serif'],
-                        thaiTitle: ['"Charmonman"', 'cursive'],
-                        sans: ['"Prompt"', '"Sarabun"', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        /* พื้นหลังลวดลายเรขาคณิต Art Deco แบบ Subtle */
-        body {
-            background-color: #121110;
-            color: #F4EFE6;
-            background-image: 
-                radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 60%),
-                repeating-linear-gradient(45deg, rgba(212, 175, 55, 0.03) 0px, rgba(212, 175, 55, 0.03) 1px, transparent 1px, transparent 12px),
-                repeating-linear-gradient(-45deg, rgba(212, 175, 55, 0.03) 0px, rgba(212, 175, 55, 0.03) 1px, transparent 1px, transparent 12px);
-            overflow-x: hidden;
-        }
-
-        /* กรอบ Art Deco สองชั้นพร้อมมุมตัดเรขาคณิต */
-        .art-deco-border {
-            position: relative;
-            border: 2px solid #D4AF37;
-            box-shadow: 0 0 0 4px #121110, 0 0 0 5px rgba(212, 175, 55, 0.5), 0 10px 25px rgba(0,0,0,0.7);
-        }
-
-        .art-deco-card {
-            background: linear-gradient(145deg, #1E1C18 0%, #141310 100%);
-            border: 1px solid rgba(212, 175, 55, 0.45);
-            position: relative;
-            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
-        }
-
-        .art-deco-card:hover {
-            border-color: #D4AF37;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.18);
-        }
-
-        /* มุมประดับสไตล์ Gatsby */
-        .deco-corner::before,
-        .deco-corner::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            border-color: #D4AF37;
-            border-style: solid;
-            pointer-events: none;
-        }
-        .deco-corner::before {
-            top: 5px;
-            left: 5px;
-            border-width: 2px 0 0 2px;
-        }
-        .deco-corner::after {
-            bottom: 5px;
-            right: 5px;
-            border-width: 0 2px 2px 0;
-        }
-
-        /* เอฟเฟกต์ป้ายตัวเลขกลไกยุค 1920s (Mechanical Flip Counter Look) */
-        .vintage-price-tag {
-            background: #F4EFE6;
-            color: #121110;
-            border: 2px solid #997A15;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.35);
-            font-variant-numeric: tabular-nums;
-        }
-
-        /* แถบเลื่อนแนวนอนสำหรับไอคอนแบรนด์บนมือถือ */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        /* ปุ่มสไตล์ทองเหลืองโบราณ */
-        .btn-brass {
-            background: linear-gradient(180deg, #E5C158 0%, #B8860B 100%);
-            color: #121110;
-            border: 1px solid #FFF2B2;
-            box-shadow: 0 3px 0 #705204, 0 5px 12px rgba(0,0,0,0.5);
-            transition: all 0.15s ease;
-        }
-        .btn-brass:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #705204, 0 2px 6px rgba(0,0,0,0.5);
-        }
-
-        /* ปุ่มสไตล์แดงวินเทจ */
-        .btn-crimson {
-            background: linear-gradient(180deg, #A51C1C 0%, #6E0D0D 100%);
-            color: #F4EFE6;
-            border: 1px solid #D4AF37;
-            box-shadow: 0 3px 0 #3D0505, 0 5px 12px rgba(0,0,0,0.5);
-            transition: all 0.15s ease;
-        }
-        .btn-crimson:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 #3D0505;
-        }
-
-        /* เส้นคั่นประดับ Art Deco */
-        .deco-divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            color: #D4AF37;
-        }
-        .deco-divider::before,
-        .deco-divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.5);
-        }
-        .deco-divider:not(:empty)::before {
-            margin-right: .75em;
-        }
-        .deco-divider:not(:empty)::after {
-            margin-left: .75em;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f6f7f9" />
+  <meta name="description" content="ค้นหาและเปรียบเทียบสถานีบริการน้ำมันในบริเวณของคุณ" />
+  <title>ปั๊มใกล้ฉัน</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root { --ink:#17212b; --muted:#667085; --line:#e6e9ee; --surface:#fff; --page:#f5f7fa; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--page); color:var(--ink); font-family:'Prompt',sans-serif; }
+    button, input, select { font:inherit; }
+    button { cursor:pointer; }
+    .brand-logo { width:52px; height:52px; border-radius:16px; display:grid; place-items:center; background:#fff; border:1px solid var(--line); box-shadow:0 4px 12px rgba(16,24,40,.06); }
+    .brand-mark { font-weight:800; letter-spacing:-.04em; line-height:1; }
+    .ptt-mark { color:#fff; background:#1594d3; border-radius:50%; width:42px;height:42px;display:grid;place-items:center;font-size:13px; }
+    .bangchak-mark { color:#fff; background:#006c4e; border-radius:12px 12px 12px 4px; width:42px;height:42px;display:grid;place-items:center;font-size:10px; }
+    .shell-mark { color:#dd1d20; background:#ffd520; border:2px solid #dd1d20; border-radius:50%; width:42px;height:42px;display:grid;place-items:center;font-size:10px; }
+    .caltex-mark { color:#fff; background:#e11b22; clip-path:polygon(50% 0,100% 30%,82% 100%,18% 100%,0 30%); width:42px;height:42px;display:grid;place-items:center;font-size:9px; }
+    .pt-mark { color:#fff; background:#20a64b; width:42px;height:42px;display:grid;place-items:center;border-radius:8px;font-size:14px; }
+    .esso-mark { color:#fff; background:#ed1c24; border:3px solid #1a3c95; border-radius:50%; width:42px;height:42px;display:grid;place-items:center;font-size:9px; }
+    .all-mark { color:#344054; font-size:22px; }
+    .station-card { transition:.18s ease; }
+    .station-card:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(16,24,40,.08); }
+    .scrollbar-none::-webkit-scrollbar { display:none; }
+    .scrollbar-none { scrollbar-width:none; }
+    .modal-open { overflow:hidden; }
+  </style>
 </head>
-<body class="min-h-screen font-sans antialiased selection:bg-decoGold selection:text-decoBlack pb-12">
-
-    <!-- Toast Notification (แทน alert ตามกฎ) -->
-    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-xs w-full"></div>
-
-    <!-- แถบติดตั้งแอปลงหน้าจอโฮมสไตล์ป้ายทองเหลืองยุค 1920s (PWA Install Banner) -->
-    <div id="pwa-install-banner" class="hidden max-w-5xl mx-auto px-4 pt-4">
-        <div class="bg-gradient-to-r from-decoDark via-[#26221B] to-decoDark border-2 border-decoGold rounded-xl p-3.5 sm:px-5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-[0_6px_20px_rgba(212,175,55,0.2)]">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-decoBlack border border-decoGold flex items-center justify-center shrink-0 shadow-inner">
-                    <!-- ไอคอนหัวจ่ายน้ำมันวินเทจ 1920s -->
-                    <svg class="w-7 h-7 text-decoGold" viewBox="0 0 36 36" fill="none">
-                        <rect x="10" y="11" width="12" height="19" rx="2" stroke="currentColor" stroke-width="2" fill="#8B0000" fill-opacity="0.45"/>
-                        <circle cx="16" cy="7" r="4.5" fill="#F4EFE6" stroke="currentColor" stroke-width="2"/>
-                        <path d="M16 5V7L17.5 8" stroke="#121110" stroke-width="1.5" stroke-linecap="round"/>
-                        <path d="M22 15H24.5C25.6 15 26.5 15.9 26.5 17V24C26.5 25.1 27.4 26 28.5 26C29.6 26 30.5 25.1 30.5 24V13L27.5 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="8" y1="30" x2="24" y2="30" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div>
-                    <div class="text-xs sm:text-sm font-bold text-decoGold flex items-center gap-1.5">
-                        <span>📲 ติดตั้งแอป "ปั๊มใกล้ฉัน 1920s"</span>
-                    </div>
-                    <p id="pwa-install-desc" class="text-[11px] sm:text-xs text-decoCream/80">
-                        เพิ่มลงหน้าจอโฮมเพื่อเปิดใช้งานเต็มจอแบบแอปมือถือ รวดเร็วทันใจ
-                    </p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                <button id="btn-pwa-install" onclick="triggerPWAInstall()" class="btn-brass flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap cursor-pointer">
-                    + ติดตั้งลงหน้าจอโฮม
-                </button>
-                <button onclick="dismissInstallBanner()" class="px-2.5 py-2 rounded-lg text-xs text-decoCream/60 hover:text-decoGold border border-decoGold/30 cursor-pointer" title="ซ่อนแถบนี้">
-                    ✕
-                </button>
-            </div>
+<body>
+  <header class="sticky top-0 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur">
+    <div class="mx-auto max-w-6xl px-4 py-3">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="grid h-11 w-11 place-items-center rounded-2xl bg-blue-600 text-white shadow-sm">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 22V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17"/><path d="M15 10h2a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L19.5 5.5"/><path d="M3 22h17"/><rect x="6" y="7" width="6" height="5" rx="1"/></svg>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold leading-tight sm:text-xl">ปั๊มใกล้ฉัน</h1>
+            <p class="text-xs text-slate-500">ค้นหา • เปรียบเทียบ • นำทาง</p>
+          </div>
         </div>
+        <button onclick="openPriceModal()" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
+          ดูราคาน้ำมัน
+        </button>
+      </div>
     </div>
+  </header>
 
-    <!-- Modal คู่มือติดตั้งบน iOS Safari (แสดงเมื่อกดปุ่มติดตั้งบน iPhone/iPad) -->
-    <div id="ios-install-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
-        <div class="art-deco-border bg-decoDark w-full max-w-md rounded-xl p-5 text-decoCream space-y-4">
-            <div class="flex items-center justify-between border-b border-decoGold/40 pb-3">
-                <h3 class="text-base sm:text-lg font-bold text-decoGold">วิธีติดตั้งแอปบน iPhone / iPad</h3>
-                <button onclick="closeIOSModal()" class="w-8 h-8 rounded-lg bg-decoBlack border border-decoGold text-decoGold font-bold cursor-pointer">✕</button>
-            </div>
-            <ol class="space-y-3 text-xs sm:text-sm text-decoCream/90">
-                <li class="flex items-start gap-2.5">
-                    <span class="w-6 h-6 rounded-full bg-decoGold text-decoBlack font-bold flex items-center justify-center shrink-0 text-xs">1</span>
-                    <span>เปิดหน้าเว็บนี้ผ่านเบราว์เซอร์ <strong>Safari</strong></span>
-                </li>
-                <li class="flex items-start gap-2.5">
-                    <span class="w-6 h-6 rounded-full bg-decoGold text-decoBlack font-bold flex items-center justify-center shrink-0 text-xs">2</span>
-                    <span>แตะปุ่ม <strong>แชร์ (Share)</strong> <span class="inline-block px-1.5 py-0.5 bg-decoBlack border border-decoGold/50 rounded text-decoGold">⍗</span> ที่แถบเมนูด้านล่าง</span>
-                </li>
-                <li class="flex items-start gap-2.5">
-                    <span class="w-6 h-6 rounded-full bg-decoGold text-decoBlack font-bold flex items-center justify-center shrink-0 text-xs">3</span>
-                    <span>เลื่อนลงแล้วเลือก <strong>"เพิ่มไปยังหน้าจอโฮม" (Add to Home Screen)</strong> จากนั้นกด <strong>เพิ่ม</strong></span>
-                </li>
-            </ol>
-            <div class="pt-2 text-right">
-                <button onclick="closeIOSModal()" class="btn-brass w-full py-2 rounded-lg text-sm font-bold cursor-pointer">เข้าใจแล้ว</button>
-            </div>
+  <main class="mx-auto max-w-6xl px-4 pb-16">
+    <section class="pt-5">
+      <div class="grid gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:grid-cols-[1fr_auto]">
+        <button id="gps-button" onclick="locateUser()" class="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          <span id="gps-button-label">ใช้ตำแหน่งของฉัน</span>
+        </button>
+        <select id="area-select" onchange="changeArea(this.value)" class="min-h-12 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-blue-500">
+          <option value="chonburi">หมอนนาง / พนัสนิคม</option>
+          <option value="bangkok">กรุงเทพฯ — สุขุมวิท</option>
+          <option value="chiangmai">เชียงใหม่ — คูเมือง</option>
+          <option value="phuket">ภูเก็ต — เมืองเก่า</option>
+          <option value="gps" id="gps-option" disabled>ตำแหน่งปัจจุบันของคุณ</option>
+        </select>
+      </div>
+
+      <div id="manual-location" class="mt-3 hidden rounded-2xl border border-amber-200 bg-amber-50 p-3">
+        <p class="mb-2 text-sm text-amber-900">ระบุตำแหน่งเองได้หากเข้าถึง GPS ไม่สำเร็จ</p>
+        <div class="grid gap-2 sm:grid-cols-3">
+          <input id="manual-lat" type="number" step="any" placeholder="ละติจูด" class="rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm outline-none" />
+          <input id="manual-lng" type="number" step="any" placeholder="ลองจิจูด" class="rounded-xl border border-amber-200 bg-white px-3 py-2.5 text-sm outline-none" />
+          <button onclick="applyManualLocation()" class="rounded-xl bg-amber-700 px-4 py-2.5 text-sm font-semibold text-white">ยืนยันตำแหน่ง</button>
         </div>
+      </div>
+
+      <div class="mt-3 flex items-center gap-2 text-sm text-slate-500">
+        <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+        <span id="location-label">กำลังแสดงพื้นที่ หมอนนาง / พนัสนิคม</span>
+      </div>
+    </section>
+
+    <section class="mt-5">
+      <div class="mb-3 flex items-end justify-between">
+        <div>
+          <h2 class="font-bold">เลือกตราสถานี</h2>
+          <p class="text-xs text-slate-500">แตะเพื่อกรองผลลัพธ์</p>
+        </div>
+        <button id="reset-filter" onclick="resetFilters()" class="hidden text-sm font-semibold text-blue-600">ล้างตัวกรอง</button>
+      </div>
+      <div id="brand-grid" class="scrollbar-none grid grid-cols-4 gap-2 overflow-x-auto sm:grid-cols-7"></div>
+    </section>
+
+    <section class="mt-4 grid gap-3 sm:grid-cols-[1fr_180px]">
+      <label class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="search-input" oninput="renderStations()" type="search" placeholder="ค้นหาชื่อสาขา หรือถนน" class="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm outline-none focus:border-blue-500" />
+      </label>
+      <select id="radius-select" onchange="renderStations()" class="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-blue-500">
+        <option value="999">ระยะทาง: ทั้งหมด</option>
+        <option value="3">ไม่เกิน 3 กม.</option>
+        <option value="5">ไม่เกิน 5 กม.</option>
+        <option value="10">ไม่เกิน 10 กม.</option>
+      </select>
+    </section>
+
+    <section class="mt-5">
+      <div class="mb-3 flex items-center justify-between">
+        <p class="text-sm text-slate-500">พบ <strong id="station-count" class="text-slate-900">0</strong> สถานี</p>
+        <button onclick="openPriceModal()" class="text-sm font-semibold text-blue-600">ดูราคาทั้งหมด</button>
+      </div>
+      <div id="stations-list" class="grid gap-3 md:grid-cols-2"></div>
+    </section>
+  </main>
+
+  <div id="price-modal" class="fixed inset-0 z-50 hidden items-end justify-center bg-slate-950/50 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true">
+    <div class="max-h-[92vh] w-full max-w-xl overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl">
+      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+        <div>
+          <h2 class="font-bold">ราคาน้ำมันปัจจุบัน</h2>
+          <p id="price-date" class="mt-0.5 text-xs text-slate-500">กำลังโหลดข้อมูล...</p>
+        </div>
+        <button onclick="closePriceModal()" class="grid h-9 w-9 place-items-center rounded-full bg-slate-100 text-slate-600" aria-label="ปิด">✕</button>
+      </div>
+      <div class="max-h-[calc(92vh-73px)] overflow-y-auto p-4">
+        <div id="price-brand-tabs" class="scrollbar-none mb-4 flex gap-2 overflow-x-auto"></div>
+        <div class="rounded-2xl border border-slate-200">
+          <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+            <strong id="selected-price-brand">ปตท.</strong>
+            <span class="text-xs text-slate-500">บาท / ลิตร</span>
+          </div>
+          <div id="price-rows" class="divide-y divide-slate-100"></div>
+        </div>
+
+        <div class="mt-4 rounded-2xl bg-slate-50 p-4">
+          <h3 class="mb-3 font-semibold">คำนวณค่าใช้จ่าย</h3>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <select id="fuel-select" onchange="calculateFuel()" class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none"></select>
+            <input id="amount-input" type="number" value="500" min="1" oninput="calculateFuel()" class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none" placeholder="จำนวนเงิน (บาท)" />
+          </div>
+          <div class="mt-3 flex gap-2">
+            <button onclick="setAmount(300)" class="flex-1 rounded-lg border border-slate-200 bg-white py-2 text-xs">300 ฿</button>
+            <button onclick="setAmount(500)" class="flex-1 rounded-lg border border-slate-200 bg-white py-2 text-xs">500 ฿</button>
+            <button onclick="setAmount(1000)" class="flex-1 rounded-lg border border-slate-200 bg-white py-2 text-xs">1,000 ฿</button>
+          </div>
+          <div class="mt-4 flex items-end justify-between border-t border-slate-200 pt-4">
+            <span class="text-sm text-slate-500">ประมาณการน้ำมัน</span>
+            <div><strong id="liters-result" class="text-2xl text-blue-700">0.00</strong> <span class="text-sm">ลิตร</span></div>
+          </div>
+        </div>
+        <p id="price-source-note" class="mt-3 text-center text-xs text-slate-400">ข้อมูลอ้างอิงราคาขายปลีก กรุงเทพมหานครและปริมณฑล</p>
+      </div>
     </div>
+  </div>
 
-    <!-- Header สไตล์ป้ายสถานีบริการน้ำมันยุค 1920s -->
-    <header class="pt-6 pb-4 px-4 max-w-5xl mx-auto">
-        <div class="art-deco-border bg-decoDark rounded-xl p-5 sm:p-7 text-center relative overflow-hidden">
-            <!-- รัศมีแสง Sunburst ด้านหลัง -->
-            <div class="absolute inset-0 opacity-15 pointer-events-none" style="background: repeating-conic-gradient(from 0deg at 50% 100%, #D4AF37 0deg 5deg, transparent 5deg 15deg);"></div>
-            
-            <div class="relative z-10">
-                <div class="flex items-center justify-center gap-3 mb-1">
-                    <span class="h-[1px] w-8 sm:w-16 bg-decoGold"></span>
-                    <span class="font-deco text-xs sm:text-sm tracking-[0.25em] text-decoGold uppercase">EST. 1924 • MOTOR FUEL &amp; SERVICE</span>
-                    <span class="h-[1px] w-8 sm:w-16 bg-decoGold"></span>
-                </div>
-                
-                <h1 class="text-2xl sm:text-4xl md:text-5xl font-bold text-decoGold tracking-wide drop-shadow-md my-1">
-                    สถานีบริการน้ำมันใกล้ฉัน
-                </h1>
-                <p class="text-decoCream/80 text-xs sm:text-sm max-w-xl mx-auto mt-1">
-                    ค้นหาจุดเติมเชื้อเพลิง ตรวจสอบราคาน้ำมันล่าสุด และนำทางสู่สถานีที่ใกล้คุณที่สุด
-                </p>
+  <div id="toast" class="fixed left-1/2 top-4 z-[60] hidden -translate-x-1/2 rounded-xl bg-slate-900 px-4 py-3 text-center text-sm text-white shadow-xl"></div>
 
-                <!-- ป้ายแสดงวันที่อัปเดตราคาน้ำมันปัจจุบัน -->
-                <div class="mt-2.5 inline-flex items-center gap-2 bg-decoBlack/90 border border-decoGold/60 rounded-full px-3.5 py-1 text-[11px] sm:text-xs text-decoGoldLight">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                    <span id="price-date-badge">อัปเดตราคาน้ำมันล่าสุด: 20 พฤศจิกายน 2569 (2026)</span>
-                </div>
+  <script>
+    const API_URL = 'https://api.chnwt.dev/thai-oil-api/latest';
+    const FALLBACK_BRANDS = {
+      ptt:{ name:'ปตท.', mark:'ptt', prices:[['แก๊สโซฮอล์ 95',38.14],['แก๊สโซฮอล์ 91',37.77],['แก๊สโซฮอล์ E20',30.10],['แก๊สโซฮอล์ E85',31.89],['ดีเซล B7',32.94],['เบนซิน 95',46.79]] },
+      bcp:{ name:'บางจาก', mark:'bangchak', prices:[['แก๊สโซฮอล์ 95',38.14],['แก๊สโซฮอล์ 91',37.77],['แก๊สโซฮอล์ E20',30.10],['ดีเซล B7',32.94],['ไฮพรีเมียม 97',52.34]] },
+      shell:{ name:'เชลล์', mark:'shell', prices:[['ฟิวเซฟ แก๊สโซฮอล์ 95',38.64],['ฟิวเซฟ แก๊สโซฮอล์ 91',38.27],['แก๊สโซฮอล์ E20',30.60],['ดีเซล B7',32.94],['วี-เพาเวอร์ ดีเซล',56.89]] },
+      caltex:{ name:'คาลเท็กซ์', mark:'caltex', prices:[['แก๊สโซฮอล์ 95',38.14],['แก๊สโซฮอล์ 91',37.77],['แก๊สโซฮอล์ E20',30.10],['ดีเซล B7',32.94],['พาวเวอร์ ดีเซล',53.19]] },
+      pt:{ name:'พีที', mark:'pt', prices:[['แก๊สโซฮอล์ 95',38.14],['แก๊สโซฮอล์ 91',37.77],['แก๊สโซฮอล์ E20',30.10],['ดีเซล B7',32.94],['เบนซิน 95',47.29]] },
+      esso:{ name:'เอสโซ่', mark:'esso', prices:[['แก๊สโซฮอล์ 95',38.14],['แก๊สโซฮอล์ 91',37.77],['แก๊สโซฮอล์ E20',30.10],['ดีเซล B7',32.94],['ซูพรีม พลัส ดีเซล',54.19]] }
+    };
 
-                <!-- แผงควบคุมตำแหน่ง (GPS & พื้นที่จำลอง) -->
-                <div class="mt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
-                    <button id="btn-gps" onclick="locateUserGPS()" class="btn-brass w-full sm:w-auto px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 cursor-pointer">
-                        <!-- ไอคอนเข็มทิศวินเทจ -->
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor"/>
-                        </svg>
-                        <span id="gps-btn-text">ค้นหาจากตำแหน่ง GPS ปัจจุบัน</span>
-                    </button>
+    let liveBrands = null;
+    let selectedBrand = 'ptt';
+    let selectedFilter = 'ALL';
 
-                    <div class="flex items-center gap-2 w-full sm:w-auto bg-decoBlack/80 border border-decoGold/50 rounded-lg px-3 py-2">
-                        <span class="text-xs text-decoGold whitespace-nowrap">พื้นที่:</span>
-                        <select id="preset-location" onchange="changePresetLocation(this.value)" class="bg-transparent text-decoCream text-sm focus:outline-none w-full cursor-pointer">
-                            <option value="chonburi" class="bg-decoBlack text-decoCream">หมอนนาง / พนัสนิคม จ.ชลบุรี</option>
-                            <option value="bangkok" class="bg-decoBlack text-decoCream">กรุงเทพมหานคร (สุขุมวิท)</option>
-                            <option value="chiangmai" class="bg-decoBlack text-decoCream">เชียงใหม่ (คูเมือง)</option>
-                            <option value="phuket" class="bg-decoBlack text-decoCream">ภูเก็ต (เมืองเก่า)</option>
-                            <option value="gps" id="opt-gps" disabled class="bg-decoBlack text-decoGold">📍 ตำแหน่งปัจจุบันของคุณ</option>
-                        </select>
-                    </div>
-                </div>
+    const areas = {
+      chonburi:{ name:'หมอนนาง / พนัสนิคม', lat:13.4385, lng:101.2140 },
+      bangkok:{ name:'กรุงเทพฯ — สุขุมวิท', lat:13.7367, lng:100.5604 },
+      chiangmai:{ name:'เชียงใหม่ — คูเมือง', lat:18.7883, lng:98.9853 },
+      phuket:{ name:'ภูเก็ต — เมืองเก่า', lat:7.8848, lng:98.3883 }
+    };
 
-                <!-- แถบแจ้งเตือนและทางเลือกสำรองเมื่อ GPS ถูกบล็อกในหน้าต่างพรีวิวหรือเบราว์เซอร์ -->
-                <div id="gps-help-box" class="hidden mt-3 max-w-xl mx-auto bg-decoBlack/95 border border-amber-500/70 rounded-xl p-3.5 text-left text-xs space-y-2.5 shadow-lg">
-                    <div class="flex items-start justify-between gap-2">
-                        <div class="font-bold text-amber-400 flex items-center gap-1.5">
-                            <span>⚠️ ไม่สามารถเข้าถึงพิกัด GPS โดยตรงได้</span>
-                        </div>
-                        <button onclick="document.getElementById('gps-help-box').classList.add('hidden')" class="text-decoCream/60 hover:text-decoGold cursor-pointer">✕</button>
-                    </div>
-                    <p id="gps-error-detail" class="text-decoCream/85 leading-relaxed">
-                        อาจเกิดจากหน้าต่างพรีวิวจำกัดสิทธิ์ GPS หรือเบราว์เซอร์ยังไม่ได้รับอนุญาตให้เข้าถึงตำแหน่ง
-                    </p>
-                    <div class="flex flex-wrap items-center gap-2 pt-1">
-                        <button onclick="locateByIPFallback()" class="btn-brass px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer">
-                            🌐 ใช้พิกัดจากอินเทอร์เน็ต (IP) แทน
-                        </button>
-                        <button onclick="toggleManualCoordInput()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-decoDark border border-decoGold/50 text-decoGold hover:bg-decoGold/10 cursor-pointer">
-                            ✍️ ระบุพิกัด ละติจูด/ลองจิจูด เอง
-                        </button>
-                    </div>
-                    <!-- ช่องกรอกพิกัดด้วยตนเอง -->
-                    <div id="manual-coord-panel" class="hidden pt-2 border-t border-decoGold/20 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <input type="number" step="any" id="manual-lat" placeholder="ละติจูด เช่น 13.4385" class="bg-decoDark border border-decoGold/50 rounded-lg px-2.5 py-1.5 text-xs text-decoCream focus:outline-none">
-                        <input type="number" step="any" id="manual-lng" placeholder="ลองจิจูด เช่น 101.2140" class="bg-decoDark border border-decoGold/50 rounded-lg px-2.5 py-1.5 text-xs text-decoCream focus:outline-none">
-                        <button onclick="applyManualCoords()" class="btn-crimson py-1.5 px-3 rounded-lg text-xs font-bold cursor-pointer">ยืนยันพิกัดนี้</button>
-                    </div>
-                </div>
+    let state = { lat:areas.chonburi.lat, lng:areas.chonburi.lng, name:areas.chonburi.name, stations:[] };
 
-                <!-- แถบสถานะพิกัดปัจจุบัน -->
-                <div id="location-status" class="mt-3 text-xs text-decoGoldLight/90 flex items-center justify-center gap-1.5">
-                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span id="location-label">กำลังแสดงสถานีรอบพื้นที่: ต.หมอนนาง อ.พนัสนิคม จ.ชลบุรี</span>
-                </div>
+    const templates = [
+      {brand:'ptt',branch:'ปตท. แยกหมอนนาง',road:'ถนนสุขประยูร',dLat:.0065,dLng:.0042,open:'เปิด 24 ชั่วโมง',amenities:['Cafe Amazon','EV Charger','ห้องน้ำ']},
+      {brand:'bcp',branch:'บางจาก พนัสนิคม กม.24',road:'ถนนพนัสนิคม-ฉะเชิงเทรา',dLat:-.011,dLng:.0085,open:'05:00–23:00',amenities:['อินทนิล','Mini Big C']},
+      {brand:'shell',branch:'เชลล์ ถนนเลี่ยงเมือง',road:'ถนนบายพาสสายตะวันออก',dLat:.0145,dLng:-.012,open:'เปิด 24 ชั่วโมง',amenities:['Shell Café','บริการล้างรถ']},
+      {brand:'pt',branch:'พีที บ้านบึง-พนัส',road:'ถนนสาย 349',dLat:-.0185,dLng:-.0095,open:'05:30–22:30',amenities:['กาแฟพันธุ์ไทย','ร้านสะดวกซื้อ']},
+      {brand:'caltex',branch:'คาลเท็กซ์ ประตูเมืองตะวันออก',road:'ถนนสุขุมวิทสายเก่า',dLat:.024,dLng:.019,open:'06:00–22:00',amenities:['ล้างรถ','ห้องน้ำ']},
+      {brand:'ptt',branch:'ปตท. ทางหลวง 331',road:'ถนนสัตหีบ-พนมสารคาม',dLat:-.031,dLng:.025,open:'เปิด 24 ชั่วโมง',amenities:['Cafe Amazon','Jiffy']},
+      {brand:'esso',branch:'เอสโซ่ แยกดอนหัวฬ่อ',road:'ถนนดอนหัวฬ่อ-อมตะ',dLat:.038,dLng:-.029,open:'เปิด 24 ชั่วโมง',amenities:['Lotus go fresh','ลมยาง']},
+      {brand:'bcp',branch:'บางจาก คลองหลวง-นิคมฯ',road:'ถนนเลียบคลองชลประทาน',dLat:.049,dLng:.036,open:'05:00–23:30',amenities:['EV Charger','ร้านสะดวกซื้อ']}
+    ];
+
+    function distance(lat1,lng1,lat2,lng2){
+      const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
+      const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+      return +(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(2);
+    }
+
+    function generateStations(){
+      state.stations=templates.map((t,i)=>({
+        ...t,id:i+1,lat:state.lat+t.dLat,lng:state.lng+t.dLng,
+        distance:distance(state.lat,state.lng,state.lat+t.dLat,state.lng+t.dLng)
+      })).sort((a,b)=>a.distance-b.distance);
+    }
+
+    function brandMark(id, small=false){
+      const cls=small?'brand-mark':'brand-mark';
+      if(id==='ptt') return `<span class="${cls} ptt-mark">PTT</span>`;
+      if(id==='bcp') return `<span class="${cls} bangchak-mark">บางจาก</span>`;
+      if(id==='shell') return `<span class="${cls} shell-mark">Shell</span>`;
+      if(id==='caltex') return `<span class="${cls} caltex-mark">Caltex</span>`;
+      if(id==='pt') return `<span class="${cls} pt-mark">PT</span>`;
+      if(id==='esso') return `<span class="${cls} esso-mark">ESSO</span>`;
+      return `<span class="all-mark">★</span>`;
+    }
+
+    function renderBrands(){
+      const brands=[['ALL','ทั้งหมด','all'],...Object.entries(FALLBACK_BRANDS).map(([id,b])=>[id,b.name,id])];
+      document.getElementById('brand-grid').innerHTML=brands.map(([id,name,mark])=>`
+        <button onclick="selectBrand('${id}')" class="flex min-h-[82px] flex-col items-center justify-center rounded-2xl border p-2 transition ${selectedFilter===id?'border-blue-600 bg-blue-50':'border-slate-200 bg-white'}">
+          <span class="brand-logo mb-1.5 !h-12 !w-12">${id==='ALL'?brandMark('ALL'):brandMark(id)}</span>
+          <span class="max-w-full truncate text-[11px] font-medium ${selectedFilter===id?'text-blue-700':'text-slate-700'}">${name}</span>
+        </button>`).join('');
+    }
+
+    function selectBrand(id){ selectedFilter=id; renderBrands(); renderStations(); }
+
+    function renderStations(){
+      const q=document.getElementById('search-input').value.trim().toLowerCase();
+      const radius=Number(document.getElementById('radius-select').value);
+      const filtered=state.stations.filter(s=>
+        (selectedFilter==='ALL'||s.brand===selectedFilter)&&s.distance<=radius&&
+        (!q||(s.branch+s.road+(s.amenities||[]).join(' ')).toLower().includes(q))
+      );
+      document.getElementById('station-count').textContent=filtered.length;
+      document.getElementById('reset-filter').classList.toggle('hidden',selectedFilter==='ALL'&&!q);
+      const list=document.getElementById('stations-list');
+      if(!filtered.length){ list.innerHTML=`<div class="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center text-sm text-slate-500">ไม่พบสถานีตามเงื่อนไขที่เลือก</div>`; return; }
+      list.innerHTML=filtered.map(s=>{
+        const b=FALLBACK_BRANDS[s.brand];
+        const mapUrl=`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`;
+        return `<article class="station-card rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="flex gap-3">
+            ${brandMark(s.brand)}
+            <div class="min-w-0 flex-1">
+              <div class="flex items-start justify-between gap-2">
+                <div><h3 class="font-bold leading-snug">${s.branch}</h3><p class="mt-1 text-xs text-slate-500">${s.road}</p></div>
+                <span class="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">${s.distance} กม.</span>
+              </div>
+              <div class="mt-3 flex flex-wrap gap-1.5">
+                <span class="rounded-md bg-emerald-50 px-2 py-1 text-xs text-emerald-700">${s.open}</span>
+                ${s.amenities.slice(0,3).map(x=>`<span class="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600">${x}</span>`).join('')}
+              </div>
             </div>
-        </div>
-    </header>
+          </div>
+          <div class="mt-4 grid grid-cols-2 gap-2">
+            <button onclick="openPriceModal('${s.brand}')" class="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">ดูราคา ${b.name}</button>
+            <a href="${mapUrl}" target="_blank" rel="noopener" class="rounded-xl bg-blue-600 px-3 py-2.5 text-center text-sm font-semibold text-white hover:bg-blue-700">เส้นทาง</a>
+          </div>
+        </article>`;
+      }).join('');
+    }
 
-    <!-- Main Content -->
-    <main class="max-w-5xl mx-auto px-4 space-y-6">
+    function resetFilters(){ selectedFilter='ALL'; document.getElementById('search-input').value=''; renderBrands(); renderStations(); }
 
-        <!-- ส่วนที่ 1: เลือกแบรนด์ปั๊มน้ำมันแบบไอคอน (Brand Filter Icons) -->
-        <section class="bg-decoDark/90 border border-decoGold/40 rounded-xl p-4 sm:p-5 shadow-lg">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-                <h2 class="text-sm sm:text-base font-semibold text-decoGold flex items-center gap-2">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 22V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17"/>
-                        <path d="M15 10h2a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 4"/>
-                        <path d="M2 22h14"/>
-                        <rect x="6" y="6" width="6" height="5" rx="1"/>
-                    </svg>
-                    <span>เลือกตราสัญลักษณ์สถานีบริการ (กดเพื่อกรอง)</span>
-                </h2>
-                <button onclick="openFuelBoardModal('PTT')" class="text-xs text-decoCream hover:text-decoGold underline decoration-decoGold/60 underline-offset-4 self-start sm:self-auto cursor-pointer">
-                    ⛽ เปิดป้ายราคาน้ำมัน &amp; เครื่องคำนวณ (20 พ.ย. 69)
-                </button>
-            </div>
+    function changeArea(id){
+      if(id==='gps') return;
+      const a=areas[id]; state.lat=a.lat; state.lng=a.lng; state.name=a.name;
+      document.getElementById('location-label').textContent=`กำลังแสดงพื้นที่ ${a.name}`;
+      generateStations(); renderStations();
+    }
 
-            <!-- แถบปุ่มไอคอนแบรนด์ -->
-            <div id="brand-filter-grid" class="grid grid-cols-4 sm:grid-cols-7 gap-2.5">
-                <!-- จะถูกสร้างด้วย JavaScript เพื่อให้มี SVG โลโก้วินเทจสวยงาม -->
-            </div>
+    function locateUser(){
+      const label=document.getElementById('gps-button-label');
+      if(!navigator.geolocation){ document.getElementById('manual-location').classList.remove('hidden'); showToast('เบราว์เซอร์นี้ไม่รองรับ GPS'); return; }
+      label.textContent='กำลังค้นหาตำแหน่ง...';
+      navigator.geolocation.getCurrentPosition(pos=>applyLocation(pos.coords.latitude,pos.coords.longitude,'ตำแหน่งปัจจุบัน'),()=>{
+        label.textContent='ใช้ตำแหน่งของฉัน';
+        document.getElementById('manual-location').classList.remove('hidden');
+        showToast('เข้าถึง GPS ไม่สำเร็จ กรุณาระบุตำแหน่งเอง');
+      },{enableHighAccuracy:true,timeout:8000,maximumAge:30000});
+    }
 
-            <!-- ช่องค้นหาชื่อสาขา / ถนน / บริการเสริม -->
-            <div class="mt-4 pt-3 border-t border-decoGold/20 flex flex-col sm:flex-row gap-3">
-                <div class="relative flex-1">
-                    <input type="text" id="search-input" oninput="filterAndRenderStations()" placeholder="ค้นหาชื่อสาขา, ชื่อถนน, หรือบริการ (เช่น กาแฟ, EV, 24 ชม.)..." class="w-full bg-decoBlack border border-decoGold/50 focus:border-decoGold rounded-lg pl-10 pr-9 py-2.5 text-sm text-decoCream placeholder-decoCream/40 focus:outline-none">
-                    <svg class="w-4 h-4 text-decoGold absolute left-3.5 top-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    </svg>
-                    <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-3 top-2.5 text-decoCream/60 hover:text-decoGold text-sm cursor-pointer">✕</button>
-                </div>
+    function applyLocation(lat,lng,name){
+      state.lat=lat; state.lng=lng; state.name=name;
+      const opt=document.getElementById('gps-option'); opt.disabled=false; opt.textContent=`📍 ${name}`;
+      document.getElementById('area-select').value='gps';
+      document.getElementById('location-label').textContent=`กำลังแสดงรอบพิกัด ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+      document.getElementById('manual-location').classList.add('hidden');
+      document.getElementById('gps-button-label').textContent='อัปเดตตำแหน่งแล้ว';
+      generateStations(); renderStations();
+    }
 
-                <!-- ตัวเลือกระยะทางสูงสุด -->
-                <div class="flex items-center gap-2 bg-decoBlack border border-decoGold/50 rounded-lg px-3 py-2">
-                    <span class="text-xs text-decoGold whitespace-nowrap">รัศมี:</span>
-                    <select id="radius-filter" onchange="filterAndRenderStations()" class="bg-transparent text-decoCream text-sm focus:outline-none cursor-pointer">
-                        <option value="999" class="bg-decoBlack">ทั้งหมด (ทุกปั๊มใกล้เคียง)</option>
-                        <option value="3" class="bg-decoBlack">ไม่เกิน 3 กม.</option>
-                        <option value="5" class="bg-decoBlack">ไม่เกิน 5 กม.</option>
-                        <option value="10" class="bg-decoBlack">ไม่เกิน 10 กม.</option>
-                    </select>
-                </div>
-            </div>
-        </section>
+    function applyManualLocation(){
+      const lat=Number(document.getElementById('manual-lat').value), lng=Number(document.getElementById('manual-lng').value);
+      if(!Number.isFinite(lat)||!Number.isFinite(lng)||lat<-90||lat>90||lng<-180||lng>180){ showToast('กรุณากรอกพิกัดให้ถูกต้อง'); return; }
+      applyLocation(lat,lng,'ตำแหน่งที่ระบุ');
+    }
 
-        <!-- ส่วนที่ 2: แถบสรุปจำนวนสถานีที่พบ -->
-        <div class="flex items-center justify-between px-1">
-            <div class="text-sm text-decoCream/90">
-                พบสถานีบริการทั้งหมด <span id="station-count" class="font-bold text-decoGold text-base">0</span> แห่ง <span class="text-xs text-decoCream/60">(เรียงจากใกล้ไปไกล)</span>
-            </div>
-            <button onclick="resetAllFilters()" id="btn-reset-filter" class="hidden text-xs text-decoGold hover:underline cursor-pointer">
-                ล้างตัวกรองทั้งหมด
-            </button>
-        </div>
-
-        <!-- ส่วนที่ 3: รายการปั๊มน้ำมันทั้งหมด (Station Cards Grid) -->
-        <section id="stations-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- การ์ดปั๊มน้ำมันจะถูกสร้างที่นี่ -->
-        </section>
-
-    </main>
-
-    <!-- Modal แสดงป้ายราคาน้ำมันยุค 1920s & เครื่องคำนวณค่าน้ำมัน -->
-    <div id="fuel-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-sm">
-        <div class="art-deco-border bg-decoDark w-full max-w-xl rounded-xl overflow-hidden max-h-[92vh] flex flex-col">
-            <!-- หัวป้ายราคาน้ำมัน -->
-            <div class="bg-decoCrimson px-5 py-4 border-b-2 border-decoGold flex items-center justify-between">
-                <div>
-                    <div class="font-deco text-[10px] tracking-[0.2em] text-decoGoldLight uppercase">OFFICIAL TARIFF BOARD • 20 NOV 2026</div>
-                    <h3 id="modal-station-title" class="text-lg sm:text-xl font-bold text-decoCream">ป้ายราคาน้ำมันประจำวัน</h3>
-                </div>
-                <button onclick="closeFuelModal()" class="w-9 h-9 rounded-lg bg-decoBlack/50 border border-decoGold text-decoGold hover:bg-decoGold hover:text-decoBlack flex items-center justify-center font-bold transition cursor-pointer">
-                    ✕
-                </button>
-            </div>
-
-            <!-- เนื้อหาป้ายราคา (เลื่อนได้) -->
-            <div class="p-4 sm:p-5 overflow-y-auto space-y-5">
-                <!-- แท็บเลือกแบรนด์ในหน้าป้ายราคา -->
-                <div>
-                    <label class="block text-xs text-decoGold mb-1.5">เลือกผู้ให้บริการเพื่อเทียบราคา:</label>
-                    <div id="modal-brand-tabs" class="flex flex-wrap gap-1.5">
-                        <!-- สร้างปุ่มเลือกแบรนด์ด้วย JS -->
-                    </div>
-                </div>
-
-                <!-- ตารางป้ายราคาน้ำมันสไตล์ป้ายกลไกกระดาษครีม -->
-                <div class="bg-decoCream text-decoBlack rounded-lg p-3.5 sm:p-4 border-2 border-decoGold shadow-inner">
-                    <div class="flex items-center justify-between border-b-2 border-decoBlack/20 pb-2 mb-3">
-                        <div class="flex items-center gap-2">
-                            <span id="modal-brand-badge" class="px-2.5 py-0.5 rounded text-xs font-bold bg-decoBlack text-decoGold">PTT</span>
-                            <span id="modal-brand-fullname" class="font-bold text-sm sm:text-base">ปตท. (PTT Station)</span>
-                        </div>
-                        <span class="text-[11px] font-medium text-decoBlack/70">บาท / ลิตร</span>
-                    </div>
-
-                    <div id="fuel-price-rows" class="space-y-2">
-                        <!-- แถวราคาน้ำมันแต่ละชนิด -->
-                    </div>
-                </div>
-
-                <!-- เครื่องคำนวณค่าน้ำมันยุค 1920s -->
-                <div class="bg-decoBlack/90 border border-decoGold/50 rounded-lg p-4">
-                    <div class="deco-divider text-xs font-semibold tracking-wider mb-3">เครื่องคำนวณปริมาณและค่าน้ำมัน</div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs text-decoCream/80 mb-1">ชนิดเชื้อเพลิง</label>
-                            <select id="calc-fuel-type" onchange="calculateFuel()" class="w-full bg-decoDark border border-decoGold/60 rounded-lg px-3 py-2 text-sm text-decoCream focus:outline-none">
-                                <!-- ตัวเลือกชนิดน้ำมัน -->
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs text-decoCream/80 mb-1">ระบุจำนวนเงินที่ต้องการเติม (บาท)</label>
-                            <input type="number" id="calc-amount" value="500" min="1" step="50" oninput="calculateFuel()" class="w-full bg-decoDark border border-decoGold/60 rounded-lg px-3 py-2 text-sm text-decoGold font-bold focus:outline-none">
-                        </div>
-                    </div>
-
-                    <!-- ปุ่มลัดจำนวนเงิน -->
-                    <div class="flex gap-2 mt-2.5">
-                        <button onclick="setCalcAmount(300)" class="flex-1 py-1 text-xs rounded bg-decoDark border border-decoGold/30 hover:border-decoGold text-decoCream cursor-pointer">300 ฿</button>
-                        <button onclick="setCalcAmount(500)" class="flex-1 py-1 text-xs rounded bg-decoDark border border-decoGold/30 hover:border-decoGold text-decoCream cursor-pointer">500 ฿</button>
-                        <button onclick="setCalcAmount(1000)" class="flex-1 py-1 text-xs rounded bg-decoDark border border-decoGold/30 hover:border-decoGold text-decoCream cursor-pointer">1,000 ฿</button>
-                        <button onclick="setCalcAmount(1500)" class="flex-1 py-1 text-xs rounded bg-decoDark border border-decoGold/30 hover:border-decoGold text-decoCream cursor-pointer">1,500 ฿</button>
-                    </div>
-
-                    <!-- ผลลัพธ์การคำนวณ -->
-                    <div class="mt-3 pt-3 border-t border-decoGold/20 flex items-center justify-between">
-                        <span class="text-xs text-decoCream/80">ปริมาณน้ำมันที่จะได้รับโดยประมาณ:</span>
-                        <div class="text-right">
-                            <span id="calc-liters-result" class="text-xl font-bold text-decoGold">0.00</span>
-                            <span class="text-xs text-decoCream ml-1">ลิตร</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer Modal -->
-            <div class="px-5 py-3 bg-decoBlack border-t border-decoGold/40 flex justify-between items-center">
-                <span class="text-[11px] text-decoCream/60">* ราคาน้ำมัน ณ วันที่ 20 พ.ย. 2569 (อ้างอิงเขต กทม. และปริมณฑล)</span>
-                <button onclick="closeFuelModal()" class="btn-brass px-5 py-1.5 rounded-lg text-sm font-bold cursor-pointer">ปิดหน้าต่าง</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        /**
-         * วันที่อัปเดตราคาน้ำมันล่าสุด
-         */
-        const PRICE_UPDATED_AT = '20 พฤศจิกายน 2569';
-
-        /**
-         * ข้อมูลแบรนด์ปั๊มน้ำมันพร้อมไอคอน SVG สไตล์วินเทจ 1920s และราคาน้ำมันปัจจุบัน (20 พ.ย. 2569)
-         */
-        const BRANDS = {
-            ALL: {
-                id: 'ALL',
-                name: 'ทั้งหมด',
-                fullName: 'ทุกสถานีบริการ',
-                color: '#D4AF37',
-                bgBadge: 'bg-decoGold text-decoBlack',
-                svg: `<svg class="w-7 h-7" viewBox="0 0 36 36" fill="none">
-                        <circle cx="18" cy="18" r="15" stroke="currentColor" stroke-width="2"/>
-                        <path d="M18 6L21 15H30L23 20L25.5 29L18 23.5L10.5 29L13 20L6 15H15L18 6Z" fill="currentColor"/>
-                      </svg>`
-            },
-            PTT: {
-                id: 'PTT',
-                name: 'ปตท.',
-                fullName: 'PTT Station (ปตท.)',
-                color: '#1D8FE1',
-                bgBadge: 'bg-sky-700 text-white',
-                svg: `<svg class="w-7 h-7" viewBox="0 0 36 36" fill="none">
-                        <path d="M18 4C18 4 8 15 8 22C8 27.5 12.5 32 18 32C23.5 32 28 27.5 28 22C28 15 18 4 18 4Z" stroke="#38BDF8" stroke-width="2.2" fill="#0369A1" fill-opacity="0.35"/>
-                        <path d="M18 11C18 11 13 17.5 13 21.5C13 24.3 15.2 26.5 18 26.5C20.8 26.5 23 24.3 23 21.5C23 17.5 18 11 18 11Z" fill="#EF4444"/>
-                      </svg>`,
-                prices: [
-                    { name: 'แก๊สโซฮอล์ 95', price: 38.14, tag: 'ยอดนิยม', tagColor: 'bg-amber-700 text-white' },
-                    { name: 'แก๊สโซฮอล์ 91', price: 37.77, tag: '', tagColor: '' },
-                    { name: 'แก๊สโซฮอล์ E20', price: 30.10, tag: 'ประหยัด', tagColor: 'bg-emerald-700 text-white' },
-                    { name: 'แก๊สโซฮอล์ E85', price: 31.89, tag: '', tagColor: '' },
-                    { name: 'ดีเซล B7', price: 39.99, tag: 'มาตรฐาน', tagColor: 'bg-sky-800 text-white' },
-                    { name: 'Super Power ดีเซล', price: 51.99, tag: 'พรีเมียม', tagColor: 'bg-decoCrimson text-decoGold' },
-                    { name: 'เบนซิน 95', price: 46.79, tag: '', tagColor: '' }
-                ]
-            },
-            BANGCHAK: {
-                id: 'BANGCHAK',
-                name: 'บางจาก',
-                fullName: 'Bangchak (บางจาก)',
-                color: '#22C55E',
-                bgBadge: 'bg-emerald-700 text-white',
-                svg: `<svg class="w-7 h-7" viewBox="0 0 36 36" fill="none">
-                        <circle cx="18" cy="18" r="14" stroke="#4ADE80" stroke-width="2.2" fill="#15803D" fill-opacity="0.35"/>
-                        <path d="M11 23C11 16 17 11 25 11C25 19 20 25 13 25L11 23Z" fill="#4ADE80"/>
-                        <path d="M11 25L18 18" stroke="#14532D" stroke-width="2" stroke-linecap="round"/>
-                      </svg>`,
-                prices: [
-                    { name: 'แก๊สโซฮอล์ 95 S', price: 38.14, tag: 'ยอดนิยม', tagColor: 'bg-amber-700 text-white' },
-                    { name: 'แก๊สโซฮอล์ 91 S', price: 37.77, tag: '', tagColor: '' },
-                    { name: 'แก๊สโซฮอล์ E20 S', price: 30.10, tag: 'ประหยัด', tagColor: 'bg-emerald-700 text-white' },
-                    { name: 'แก๊สโซฮอล์ E85 S', price: 31.89, tag: '', tagColor: '' },
-                    { name: 'ไฮดีเซล S B7', price: 39.99, tag: 'มาตรฐาน', tagColor: 'bg-sky-800 text-white' },
-                    { name: 'ไฮพรีเมียม ดีเซล S', price: 54.19, tag: 'พรีเมียม', tagColor: 'bg-decoCrimson text-decoGold' },
-                    { name: 'ไฮพรีเมียม 97', price: 52.34, tag: 'ออกเทนสูง', tagColor: 'bg-purple-800 text-white' }
-                ]
-            },
-            SHELL: {
-                id: 'SHELL',
-                name: 'เชลล์',
-                fullName: 'Shell (เชลล์)',
-                color: '#FACC15',
-                bgBadge: 'bg-yellow-500 text-red-900',
-                svg: `<svg class="w-7 h-7" viewBox="0 0 36 36" fill="none">
-                        <path d="M6 22C6 13 11.5 7 18 7C24.5 7 30 13 30 22L24 29H12L6 22Z" fill="#FACC15" stroke="#DC2626" stroke-width="2.2"/>
-                        <path d="M18 7V29M13 9L15 29M23 9L21 29" stroke="#DC2626" stroke-width="1.5"/>
-                      </svg>`,
-                prices: [
-                    { name: 'ฟิวเซฟ แก๊สโซฮอล์ 95', price: 38.64, tag: '', tagColor: '' },
-                    { name: 'ฟิวเซฟ แก๊สโซฮอล์ 91', price: 38.27, tag: '', tagColor: '' },
-                    { name: 'ฟิวเซฟ แก๊สโซฮอล์ E20', price: 30.60, tag: '', tagColor: '' },
-                    { name: 'วี-เพาเวอร์ แก๊สโซฮอล์ 95', price: 52.34, tag: 'V-Power', tagColor: 'bg-decoCrimson text-decoGold' },
-                    { name: 'ฟิวเซฟ ดีเซล B7', price: 39.99, tag: 'มาตรฐาน', tagColor: 'bg-sky-800 text-white' },
-                    { name: 'วี-เพาเวอร์ ดีเซล', price: 56.89, tag: 'V-Power', tagColor: 'bg-decoCrimson text-decoGold' }
-                ]
-            },
-            CALTEX: {
-                id: 'CALTEX',
-                name: 'คาลเท็กซ์',
-                fullName: 'Caltex (คาลเท็กซ์)',
-                color: '#EF4444',
-                bgBadge: 'bg-red-700 text-white',
-                svg: `<svg class="w-7 h-7" viewBox="0 0 36 36" fill="none">
-                        <circle cx="18" cy="18" r="14" fill="#F4EFE6" stroke="#DC2626" stroke-width="2.5"/>
-                        <polygon points="18,6 21,15 30,15 22.5,20.5 25.5,29 18,23.5 10.5,29 13.5,20.5 6,15 15,15" fill="#DC2626"/>
-                      </svg>`,
-                prices: [
-                    { name: 'เทครอน แก๊สโซฮอล์ 95', price: 38.14, tag: 'Techron', tagColor: 'bg-red-700 text-white' },
-                    { name: 'เทครอน แก๊สโซฮอล์ 91', price: 37.77, tag: '', tagColor: '' },
-                    { name: 'เทครอน แก๊สโซฮอล์ E20', price: 30.10, tag: '', tagColor: '' },
-                    { name: 'เทครอน เบนซิน 95', price: 50.81, tag: 'โกลด์', tagColor: 'bg-amber-600 text-white' },
-                    { name: 'ดีเซล B7', price: 39.99, tag: 'มาตรฐาน', tagColor: 'bg-sky-800 text-white' },
-                    { name: 'พาวเวอร์ ดีเซล เทครอน ดี', price: 53.19, tag: 'พรีเมียม', tagColor: 'bg-decoCrimson text-decoGold' }
-                ]
-            },
-            PT: {
-                id: 'PT',
-                name: 'พีที',
-                fullName: 'PT Station (พีที)',
-                color: '#16A34A',
-                bgBadge: 'bg-green-700 text-white',
-                svg: `<svg class="w-7 h-7" viewBox="0 0 36 36" fill="none">
-                        <rect x="5" y="7" width="26" height="22" rx="5" fill="#15803D" stroke="#FACC15" stroke-width="2.2"/>
-                        <text x="18" y="23" text-anchor="middle" fill="#FFFFFF" font-family="serif" font-weight="bold" font-size="13">PT</text>
-                      </svg>`,
-                prices: [
-                    { name: 'แก๊สโซฮอล์ 95', price: 38.14, tag: 'ยอดนิยม', tagColor: 'bg-amber-700 text-white' },
-                    { name: 'แก๊สโซฮอล์ 91', price: 37.77, tag: '', tagColor: '' },
-                    { name: 'แก๊สโซฮอล์ E20', price: 30.10, tag: '', tagColor: '' },
-                    { name: 'เบนซิน 95', price: 47.29, tag: '', tagColor: '' },
-                    { name: 'ดีเซล B7', price: 39.99, tag: 'มาตรฐาน', tagColor: 'bg-sky-800 text-white' }
-                ]
-            },
-            ESSO: {
-                id: 'ESSO',
-                name: 'เอสโซ่/บางจาก',
-                fullName: 'Esso / Mobil (เอสโซ่)',
-                color: '#DC2626',
-                bgBadge: 'bg-blue-900 text-white',
-                svg: `<svg class="w-7 h-7" viewBox="0 0 36 36" fill="none">
-                        <ellipse cx="18" cy="18" rx="15" ry="10" fill="#F4EFE6" stroke="#1D4ED8" stroke-width="2.5"/>
-                        <text x="18" y="21.5" text-anchor="middle" fill="#DC2626" font-family="serif" font-weight="900" font-size="10.5">ESSO</text>
-                      </svg>`,
-                prices: [
-                    { name: 'ซูพรีม พลัส แก๊สโซฮอล์ 95', price: 38.14, tag: '', tagColor: '' },
-                    { name: 'แก๊สโซฮอล์ 91', price: 37.77, tag: '', tagColor: '' },
-                    { name: 'แก๊สโซฮอล์ E20', price: 30.10, tag: '', tagColor: '' },
-                    { name: 'ดีเซล B7', price: 39.99, tag: 'มาตรฐาน', tagColor: 'bg-sky-800 text-white' },
-                    { name: 'ซูพรีม พลัส ดีเซล', price: 54.19, tag: 'พรีเมียม', tagColor: 'bg-decoCrimson text-decoGold' }
-                ]
-            }
-        };
-
-        /**
-         * พื้นที่เริ่มต้นและพิกัดสำหรับจำลอง/คำนวณระยะทางจริง
-         */
-        const PRESET_LOCATIONS = {
-            chonburi: {
-                name: 'ต.หมอนนาง อ.พนัสนิคม จ.ชลบุรี',
-                lat: 13.4385,
-                lng: 101.2140
-            },
-            bangkok: {
-                name: 'ย่านสุขุมวิท กรุงเทพมหานคร',
-                lat: 13.7367,
-                lng: 100.5604
-            },
-            chiangmai: {
-                name: 'รอบคูเมือง จ.เชียงใหม่',
-                lat: 18.7883,
-                lng: 98.9853
-            },
-            phuket: {
-                name: 'ย่านเมืองเก่า จ.ภูเก็ต',
-                lat: 7.8848,
-                lng: 98.3883
-            }
-        };
-
-        // สถานะแอปพลิเคชัน
-        let currentState = {
-            userLat: PRESET_LOCATIONS.chonburi.lat,
-            userLng: PRESET_LOCATIONS.chonburi.lng,
-            locationName: PRESET_LOCATIONS.chonburi.name,
-            selectedBrand: 'ALL',
-            stations: [],
-            modalBrand: 'PTT'
-        };
-
-        /**
-         * สร้างชุดข้อมูลปั๊มน้ำมันรอบพิกัดปัจจุบัน
-         */
-        function generateNearbyStations(centerLat, centerLng, areaHint) {
-            const templates = [
-                {
-                    id: 1,
-                    brand: 'PTT',
-                    branch: 'สาขาแยกหมอนนาง - พนัสนิคม',
-                    road: 'ถ.ศุขประยูร (ทางหลวง 315)',
-                    dLat: 0.0065,
-                    dLng: 0.0042,
-                    hours: 'เปิด 24 ชั่วโมง',
-                    isOpen24: true,
-                    amenities: ['Café Amazon', '7-Eleven', 'EV Charger', 'ห้องน้ำสะอาด']
-                },
-                {
-                    id: 2,
-                    brand: 'BANGCHAK',
-                    branch: 'สาขาพนัสนิคม กม.24',
-                    road: 'ถ.พนัสนิคม - ฉะเชิงเทรา',
-                    dLat: -0.0110,
-                    dLng: 0.0085,
-                    hours: '05:00 - 23:00 น.',
-                    isOpen24: false,
-                    amenities: ['อินทนิล คอฟฟี่', 'Mini Big C', 'เติมลมยางดิจิทัล']
-                },
-                {
-                    id: 3,
-                    brand: 'SHELL',
-                    branch: 'สาขาถนนเลี่ยงเมือง',
-                    road: 'ถ.บายพาสสายตะวันออก',
-                    dLat: 0.0145,
-                    dLng: -0.0120,
-                    hours: 'เปิด 24 ชั่วโมง',
-                    isOpen24: true,
-                    amenities: ['Shell Café', 'Deli Cafe', 'เปลี่ยนถ่ายน้ำมันเครื่อง']
-                },
-                {
-                    id: 4,
-                    brand: 'PT',
-                    branch: 'สาขาบ้านบึง - พนัส',
-                    road: 'ถ.สาย 349',
-                    dLat: -0.0185,
-                    dLng: -0.0095,
-                    hours: '05:30 - 22:30 น.',
-                    isOpen24: false,
-                    amenities: ['กาแฟพันธุ์ไทย', 'Max Mart', 'บัตร PT Max Card']
-                },
-                {
-                    id: 5,
-                    brand: 'CALTEX',
-                    branch: 'สาขาประตูเมืองตะวันออก',
-                    road: 'ถ.สุขุมวิทสายเก่า',
-                    dLat: 0.0240,
-                    dLng: 0.0190,
-                    hours: '06:00 - 22:00 น.',
-                    isOpen24: false,
-                    amenities: ['ร้านสะดวกซื้อ', 'ล้างรถอัตโนมัติ', 'ห้องน้ำมาตรฐาน']
-                },
-                {
-                    id: 6,
-                    brand: 'PTT',
-                    branch: 'สาขาทางหลวงหมายเลข 331',
-                    road: 'ถ.สัตหีบ - พนมสารคาม',
-                    dLat: -0.0310,
-                    dLng: 0.0250,
-                    hours: 'เปิด 24 ชั่วโมง',
-                    isOpen24: true,
-                    amenities: ['Café Amazon', 'Jiffy', 'ศูนย์อาหาร', 'จุดพักรถบรรทุก']
-                },
-                {
-                    id: 7,
-                    brand: 'ESSO',
-                    branch: 'สาขาแยกดอนหัวฬ่อ',
-                    road: 'ถ.ดอนหัวฬ่อ - อมตะ',
-                    dLat: 0.0380,
-                    dLng: -0.0290,
-                    hours: 'เปิด 24 ชั่วโมง',
-                    isOpen24: true,
-                    amenities: ['Lotus’s go fresh', 'ร้านกาแฟ', 'ศูนย์บริการยาง']
-                },
-                {
-                    id: 8,
-                    brand: 'BANGCHAK',
-                    branch: 'สาขาคลองหลวง - นิคมฯ',
-                    road: 'ถ.เลียบคลองชลประทาน',
-                    dLat: 0.0490,
-                    dLng: 0.0360,
-                    hours: '05:00 - 23:30 น.',
-                    isOpen24: false,
-                    amenities: ['อินทนิล', 'EV Quick Charge', 'ร้านขายยา']
-                }
-            ];
-
-            const cityPrefix = areaHint.includes('กรุงเทพ') ? 'สุขุมวิท - อโศก' :
-                               areaHint.includes('เชียงใหม่') ? 'คูเมือง - ช้างเผือก' :
-                               areaHint.includes('ภูเก็ต') ? 'เมืองเก่า - ถลาง' :
-                               areaHint.includes('GPS') ? 'ใกล้พิกัดของคุณ' : '';
-
-            return templates.map((item, idx) => {
-                const lat = centerLat + item.dLat;
-                const lng = centerLng + item.dLng;
-                const dist = calculateHaversineDistance(centerLat, centerLng, lat, lng);
-                
-                let displayBranch = item.branch;
-                let displayRoad = item.road;
-                if (cityPrefix) {
-                    displayBranch = `สาขา${cityPrefix} จุดที่ ${idx + 1}`;
-                    displayRoad = `เส้นทางหลักย่าน${cityPrefix}`;
-                }
-
-                return {
-                    ...item,
-                    branch: displayBranch,
-                    road: displayRoad,
-                    lat,
-                    lng,
-                    distanceKm: dist
-                };
-            }).sort((a, b) => a.distanceKm - b.distanceKm);
+    async function loadLivePrices(){
+      try{
+        const res=await fetch(API_URL,{headers:{'Accept':'application/json'}});
+        if(!res.ok) throw new Error('HTTP '+res.status);
+        const data=await res.json();
+        const stations=data?.response?.stations;
+        if(!stations) throw new Error('Invalid response');
+        liveBrands={};
+        const names={ptt:'ปตท.',bcp:'บางจาก',shell:'เชลล์',caltex:'คาลเท็กซ์',pt:'พีที',esso:'เอสโซ่'};
+        const marks={ptt:'ptt',bcp:'bangchak',shell:'shell',caltex:'caltex',pt:'pt',esso:'esso'};
+        for(const [id,products] of Object.entries(stations)){
+          if(!names[id]) continue;
+          const prices=Object.values(products).filter(p=>p&&p.name&&p.price).map(p=>[p.name,Number(p.price)]).filter(p=>Number.isFinite(p[1])&&p[1]>0);
+          if(prices.length) liveBrands[id]={name:names[id],mark:marks[id],prices};
         }
-
-        /**
-         * สูตรคำนวณระยะทางจริงระหว่างพิกัดละติจูด/ลองจิจูด (Haversine Formula) หน่วยกิโลเมตร
-         */
-        function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return Number((R * c).toFixed(2));
-        }
-
-        /**
-         * แสดง Toast แจ้งเตือนมุมขวาบน (แทน alert)
-         */
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const borderColor = type === 'error' ? 'border-red-500' : 'border-decoGold';
-            toast.className = `pointer-events-auto bg-decoDark border-2 ${borderColor} text-decoCream px-4 py-3 rounded-lg shadow-2xl text-xs sm:text-sm flex items-center justify-between gap-2 transition-all duration-300 transform translate-y-0`;
-            toast.innerHTML = `
-                <span>${message}</span>
-                <button onclick="this.parentElement.remove()" class="text-decoGold font-bold ml-2">✕</button>
-            `;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
-        }
-
-        /**
-         * ค้นหาตำแหน่งผู้ใช้ด้วย HTML5 Geolocation API พร้อมระบบสำรองอัตโนมัติ
-         */
-        function locateUserGPS() {
-            const btnText = document.getElementById('gps-btn-text');
-            const helpBox = document.getElementById('gps-help-box');
-            const errorDetail = document.getElementById('gps-error-detail');
-
-            if (!navigator.geolocation) {
-                errorDetail.textContent = 'เบราว์เซอร์นี้ไม่รองรับ GPS ระบบกำลังค้นหาตำแหน่งจากเครือข่ายอินเทอร์เน็ตให้อัตโนมัติ...';
-                helpBox.classList.remove('hidden');
-                locateByIPFallback();
-                return;
-            }
-
-            btnText.textContent = 'กำลังจับสัญญาณตำแหน่ง...';
-
-            const onGeoSuccess = (position, sourceLabel = 'GPS') => {
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
-                applyDetectedLocation(lat, lng, `พิกัด ${sourceLabel} (${lat.toFixed(4)}, ${lng.toFixed(4)})`, sourceLabel);
-                helpBox.classList.add('hidden');
-                btnText.textContent = 'อัปเดตตำแหน่งสำเร็จ';
-                setTimeout(() => {
-                    btnText.textContent = 'ค้นหาจากตำแหน่ง GPS ปัจจุบัน';
-                }, 2500);
-            };
-
-            // รอบแรก: ลองขอพิกัดแบบมาตรฐาน (เร็วและไม่ค้างบนคอมพิวเตอร์/มือถือในอาคาร)
-            navigator.geolocation.getCurrentPosition(
-                (pos) => onGeoSuccess(pos, 'GPS'),
-                (error) => {
-                    // ตรวจสอบว่าถูกบล็อกโดย Permissions Policy (เช่น เปิดในหน้าต่าง Preview/iFrame) หรือผู้ใช้ปฏิเสธ
-                    const isPolicyBlocked = error.message && (
-                        error.message.toLowerCase().includes('permissions policy') ||
-                        error.message.toLowerCase().includes('feature policy') ||
-                        error.message.toLowerCase().includes('origin')
-                    );
-
-                    if (isPolicyBlocked) {
-                        btnText.textContent = 'ค้นหาจากตำแหน่ง GPS ปัจจุบัน';
-                        errorDetail.innerHTML = 'หน้าต่างแสดงตัวอย่าง (Preview) จำกัดสิทธิ์การเข้าถึง GPS โดยตรง <strong>ระบบกำลังดึงพิกัดจากเครือข่าย (IP) ให้อัตโนมัติ</strong> หรือคุณสามารถเปิดไฟล์นี้ในแท็บเบราว์เซอร์เต็มจอเพื่อใช้ GPS ได้ทันที';
-                        helpBox.classList.remove('hidden');
-                        locateByIPFallback(true);
-                        return;
-                    }
-
-                    if (error.code === error.PERMISSION_DENIED) {
-                        btnText.textContent = 'ค้นหาจากตำแหน่ง GPS ปัจจุบัน';
-                        errorDetail.innerHTML = 'คุณยังไม่ได้อนุญาตสิทธิ์ตำแหน่ง (Location) กรุณากดรูป <strong>แม่กุญแจ / ตั้งค่าเว็บไซต์</strong> ข้างแถบ URL เพื่อเปิดสิทธิ์ หรือใช้พิกัดจากเครือข่ายด้านล่าง';
-                        helpBox.classList.remove('hidden');
-                        showToast('ไม่ได้รับสิทธิ์เข้าถึง GPS กรุณาเลือกใช้พิกัดสำรองด้านบน', 'error');
-                        return;
-                    }
-
-                    // กรณี Timeout หรือสัญญาณอ่อน: ลองอีกครั้งด้วยความแม่นยำต่ำลง (Wi-Fi / Cell Tower)
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => onGeoSuccess(pos, 'Wi-Fi/เครือข่าย'),
-                        () => {
-                            btnText.textContent = 'ค้นหาจากตำแหน่ง GPS ปัจจุบัน';
-                            errorDetail.textContent = 'สัญญาณ GPS ขัดข้องหรือหมดเวลา ระบบกำลังดึงตำแหน่งใกล้เคียงจากอินเทอร์เน็ตให้แทน...';
-                            helpBox.classList.remove('hidden');
-                            locateByIPFallback(true);
-                        },
-                        { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
-                    );
-                },
-                { enableHighAccuracy: true, timeout: 7000, maximumAge: 30000 }
-            );
-        }
-
-        /**
-         * ระบบสำรอง: ดึงตำแหน่งคร่าวๆ จาก IP Address เมื่อ GPS ถูกบล็อกใน iFrame / Desktop
-         */
-        async function locateByIPFallback(isAuto = false) {
-            const btnText = document.getElementById('gps-btn-text');
-            btnText.textContent = 'กำลังระบุพื้นที่จากเครือข่าย...';
-            try {
-                const res = await fetch('https://get.geojs.io/v1/ip/geo.json');
-                if (!res.ok) throw new Error('Network error');
-                const data = await res.json();
-                const lat = parseFloat(data.latitude);
-                const lng = parseFloat(data.longitude);
-                if (isNaN(lat) || isNaN(lng)) throw new Error('Invalid coords');
-
-                const cityText = [data.city, data.region].filter(Boolean).join(' ') || 'ตำแหน่งเครือข่ายของคุณ';
-                applyDetectedLocation(lat, lng, `${cityText} (${lat.toFixed(4)}, ${lng.toFixed(4)})`, 'IP');
-                showToast(`🌐 ระบุพื้นที่จากเครือข่ายสำเร็จ: ${cityText}`);
-            } catch (err) {
-                showToast('ไม่สามารถดึงพิกัดอัตโนมัติได้ กรุณาเลือกพื้นที่จากรายการหรือกรอกพิกัดเอง', 'error');
-            } finally {
-                btnText.textContent = 'ค้นหาจากตำแหน่ง GPS ปัจจุบัน';
-            }
-        }
-
-        /**
-         * สลับการแสดงช่องกรอกพิกัดด้วยตนเอง
-         */
-        function toggleManualCoordInput() {
-            const panel = document.getElementById('manual-coord-panel');
-            panel.classList.toggle('hidden');
-            if (!panel.classList.contains('hidden')) {
-                document.getElementById('manual-lat').value = currentState.userLat;
-                document.getElementById('manual-lng').value = currentState.userLng;
-            }
-        }
-
-        /**
-         * ยืนยันพิกัดที่ผู้ใช้กรอกเอง
-         */
-        function applyManualCoords() {
-            const lat = parseFloat(document.getElementById('manual-lat').value);
-            const lng = parseFloat(document.getElementById('manual-lng').value);
-            if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-                showToast('กรุณากรอกค่าละติจูด (-90 ถึง 90) และลองจิจูด (-180 ถึง 180) ให้ถูกต้อง', 'error');
-                return;
-            }
-            applyDetectedLocation(lat, lng, `พิกัดกำหนดเอง (${lat.toFixed(4)}, ${lng.toFixed(4)})`, 'กำหนดเอง');
-            document.getElementById('gps-help-box').classList.add('hidden');
-            showToast('📍 อัปเดตพิกัดที่คุณระบุเรียบร้อยแล้ว');
-        }
-
-        /**
-         * อัปเดตสถานะและรายการปั๊มน้ำมันตามพิกัดใหม่
-         */
-        function applyDetectedLocation(lat, lng, labelText, mode) {
-            currentState.userLat = lat;
-            currentState.userLng = lng;
-            currentState.locationName = labelText;
-
-            const optGps = document.getElementById('opt-gps');
-            optGps.disabled = false;
-            optGps.textContent = `📍 ${labelText}`;
-            document.getElementById('preset-location').value = 'gps';
-
-            document.getElementById('location-label').textContent = `กำลังแสดงสถานีรอบ: ${labelText}`;
-            currentState.stations = generateNearbyStations(lat, lng, 'GPS');
-            filterAndRenderStations();
-        }
-
-        /**
-         * เปลี่ยนพื้นที่จำลองจาก Dropdown
-         */
-        function changePresetLocation(key) {
-            if (key === 'gps') return;
-            const loc = PRESET_LOCATIONS[key];
-            if (!loc) return;
-
-            currentState.userLat = loc.lat;
-            currentState.userLng = loc.lng;
-            currentState.locationName = loc.name;
-
-            document.getElementById('location-label').textContent = `กำลังแสดงสถานีรอบพื้นที่: ${loc.name}`;
-            currentState.stations = generateNearbyStations(loc.lat, loc.lng, loc.name);
-            filterAndRenderStations();
-        }
-
-        /**
-         * สร้างปุ่มไอคอนแบรนด์ปั๊มน้ำมัน (Brand Filter Icons)
-         */
-        function renderBrandFilters() {
-            const container = document.getElementById('brand-filter-grid');
-            container.innerHTML = '';
-
-            Object.values(BRANDS).forEach(brand => {
-                const isSelected = currentState.selectedBrand === brand.id;
-                const btn = document.createElement('button');
-                btn.onclick = () => selectBrandFilter(brand.id);
-                btn.className = `flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all cursor-pointer ${
-                    isSelected 
-                    ? 'bg-decoGold/20 border-decoGold shadow-[0_0_12px_rgba(212,175,55,0.4)] scale-[1.03]' 
-                    : 'bg-decoBlack/70 border-decoGold/25 hover:border-decoGold/70 opacity-85 hover:opacity-100'
-                }`;
-
-                btn.innerHTML = `
-                    <div class="mb-1 text-decoGold flex items-center justify-center">
-                        ${brand.svg}
-                    </div>
-                    <span class="text-[11px] sm:text-xs font-medium text-center leading-tight ${isSelected ? 'text-decoGold font-bold' : 'text-decoCream'}">
-                        ${brand.name}
-                    </span>
-                `;
-                container.appendChild(btn);
-            });
-        }
-
-        /**
-         * เลือกกรองตามแบรนด์
-         */
-        function selectBrandFilter(brandId) {
-            currentState.selectedBrand = brandId;
-            renderBrandFilters();
-            filterAndRenderStations();
-        }
-
-        /**
-         * ล้างข้อความค้นหา
-         */
-        function clearSearch() {
-            document.getElementById('search-input').value = '';
-            document.getElementById('clear-search').classList.add('hidden');
-            filterAndRenderStations();
-        }
-
-        /**
-         * รีเซ็ตตัวกรองทั้งหมด
-         */
-        function resetAllFilters() {
-            currentState.selectedBrand = 'ALL';
-            document.getElementById('search-input').value = '';
-            document.getElementById('clear-search').classList.add('hidden');
-            document.getElementById('radius-filter').value = '999';
-            renderBrandFilters();
-            filterAndRenderStations();
-        }
-
-        /**
-         * กรองและแสดงรายการการ์ดปั๊มน้ำมันทั้งหมด
-         */
-        function filterAndRenderStations() {
-            const searchQuery = document.getElementById('search-input').value.trim().toLowerCase();
-            const maxRadius = parseFloat(document.getElementById('radius-filter').value);
-            
-            // แสดง/ซ่อนปุ่มล้างคำค้นหา
-            const clearBtn = document.getElementById('clear-search');
-            if (searchQuery.length > 0) clearBtn.classList.remove('hidden');
-            else clearBtn.classList.add('hidden');
-
-            // แสดง/ซ่อนปุ่มรีเซ็ตตัวกรอง
-            const resetBtn = document.getElementById('btn-reset-filter');
-            if (currentState.selectedBrand !== 'ALL' || searchQuery !== '' || maxRadius !== 999) {
-                resetBtn.classList.remove('hidden');
-            } else {
-                resetBtn.classList.add('hidden');
-            }
-
-            // กรองข้อมูล
-            const filtered = currentState.stations.filter(station => {
-                const brandInfo = BRANDS[station.brand];
-                const matchBrand = currentState.selectedBrand === 'ALL' || station.brand === currentState.selectedBrand;
-                const matchRadius = station.distanceKm <= maxRadius;
-                const matchText = !searchQuery || 
-                    station.branch.toLowerCase().includes(searchQuery) ||
-                    station.road.toLowerCase().includes(searchQuery) ||
-                    brandInfo.name.toLowerCase().includes(searchQuery) ||
-                    brandInfo.fullName.toLowerCase().includes(searchQuery) ||
-                    station.amenities.some(a => a.toLowerCase().includes(searchQuery));
-
-                return matchBrand && matchRadius && matchText;
-            });
-
-            document.getElementById('station-count').textContent = filtered.length;
-
-            const listContainer = document.getElementById('stations-list');
-            listContainer.innerHTML = '';
-
-            if (filtered.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="col-span-full bg-decoDark border border-decoGold/40 rounded-xl p-8 text-center">
-                        <div class="text-3xl mb-2">⛽</div>
-                        <h3 class="text-lg font-bold text-decoGold">ไม่พบสถานีบริการน้ำมันที่ตรงกับเงื่อนไข</h3>
-                        <p class="text-sm text-decoCream/70 mt-1">ลองขยายรัศมีการค้นหา หรือเลือกดูทุกแบรนด์</p>
-                        <button onclick="resetAllFilters()" class="btn-brass mt-4 px-4 py-2 rounded-lg text-xs font-bold cursor-pointer">
-                            แสดงปั๊มน้ำมันทั้งหมด
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-
-            filtered.forEach(station => {
-                const brand = BRANDS[station.brand];
-                // ดึงราคาน้ำมันยอดนิยม (แก๊สโซฮอล์ 95 และ ดีเซล) มาแสดงบนการ์ด
-                const gas95 = brand.prices[0];
-                const diesel = brand.prices.find(p => p.name.includes('ดีเซล B7')) || brand.prices[brand.prices.length - 1];
-
-                const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${station.lat},${station.lng}`;
-
-                const card = document.createElement('article');
-                card.className = 'art-deco-card deco-corner rounded-xl p-4 sm:p-5 flex flex-col justify-between';
-                card.innerHTML = `
-                    <div>
-                        <!-- ส่วนหัวการ์ด: ไอคอนแบรนด์ + ชื่อสาขา + ระยะทาง -->
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-xl bg-decoBlack border border-decoGold/60 flex items-center justify-center shrink-0 shadow-inner">
-                                    ${brand.svg}
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <span class="text-[11px] font-bold px-2 py-0.5 rounded ${brand.bgBadge}">${brand.name}</span>
-                                        <span class="text-[11px] px-2 py-0.5 rounded border ${station.isOpen24 ? 'border-emerald-500/60 text-emerald-300 bg-emerald-950/40' : 'border-decoGold/40 text-decoGoldLight'}">
-                                            ${station.hours}
-                                        </span>
-                                    </div>
-                                    <h3 class="text-base sm:text-lg font-bold text-decoCream mt-1 leading-snug">
-                                        ${station.branch}
-                                    </h3>
-                                </div>
-                            </div>
-
-                            <!-- ป้ายระยะทางสไตล์วินเทจ -->
-                            <div class="vintage-price-tag px-2.5 py-1.5 rounded-lg text-center shrink-0">
-                                <div class="text-base sm:text-lg font-black leading-none text-decoCrimson">${station.distanceKm}</div>
-                                <div class="text-[10px] font-bold uppercase tracking-wider mt-0.5">กม.</div>
-                            </div>
-                        </div>
-
-                        <!-- ที่ตั้งถนน -->
-                        <p class="text-xs text-decoCream/75 mt-2.5 flex items-center gap-1.5">
-                            <span class="text-decoGold">📍</span> ${station.road}
-                        </p>
-
-                        <!-- ป้ายตัวอย่างราคาน้ำมันเบื้องต้นบนการ์ด -->
-                        <div class="mt-3 grid grid-cols-2 gap-2 bg-decoBlack/75 border border-decoGold/25 rounded-lg p-2.5">
-                            <div class="flex items-center justify-between border-r border-decoGold/20 pr-2">
-                                <span class="text-[11px] text-decoCream/80">โซฮอล์ 95</span>
-                                <span class="text-sm font-bold text-decoGold">${gas95.price.toFixed(2)} ฿</span>
-                            </div>
-                            <div class="flex items-center justify-between pl-1">
-                                <span class="text-[11px] text-decoCream/80">ดีเซล B7</span>
-                                <span class="text-sm font-bold text-decoGold">${diesel.price.toFixed(2)} ฿</span>
-                            </div>
-                        </div>
-
-                        <!-- สิ่งอำนวยความสะดวก -->
-                        <div class="mt-3 flex flex-wrap gap-1.5">
-                            ${station.amenities.map(item => `
-                                <span class="text-[11px] bg-decoDark border border-decoGold/30 text-decoCream/90 px-2 py-0.5 rounded-md">
-                                    ✦ ${item}
-                                </span>
-                            `).join('')}
-                        </div>
-                    </div>
-
-                    <!-- ปุ่มดำเนินการด้านล่างการ์ด -->
-                    <div class="mt-4 pt-3 border-t border-decoGold/25 grid grid-cols-2 gap-2.5">
-                        <button onclick="openFuelBoardModal('${station.brand}', '${station.branch}')" class="btn-brass py-2 px-3 rounded-lg text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 cursor-pointer">
-                            <span>⛽ ดูราคาน้ำมัน</span>
-                        </button>
-                        <a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="btn-crimson py-2 px-3 rounded-lg text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 text-center">
-                            <span>🧭 นำทางไปปั๊ม</span>
-                        </a>
-                    </div>
-                `;
-                listContainer.appendChild(card);
-            });
-        }
-
-        /**
-         * ระบบ Progressive Web App (PWA): สร้างไอคอน SVG หัวจ่ายน้ำมันยุค 1920s, Manifest และ Service Worker ฝังในตัว
-         */
-        let deferredInstallPrompt = null;
-
-        function setupPWA() {
-            // 1. สร้างไอคอนหัวจ่ายน้ำมันวินเทจ SVG ความละเอียดสูงสำหรับหน้าจอโฮม (192x192 และ 512x512)
-            const appIconSVG = `
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                    <rect width="512" height="512" rx="112" fill="#121110"/>
-                    <rect x="24" y="24" width="464" height="464" rx="92" fill="none" stroke="#D4AF37" stroke-width="10"/>
-                    <rect x="42" y="42" width="428" height="428" rx="78" fill="none" stroke="#D4AF37" stroke-width="3" stroke-opacity="0.5"/>
-                    <!-- หัวป้ายกลมบนตู้จ่ายน้ำมันยุค 1920s -->
-                    <circle cx="236" cy="126" r="56" fill="#F4EFE6" stroke="#D4AF37" stroke-width="12"/>
-                    <circle cx="236" cy="126" r="38" fill="none" stroke="#8B0000" stroke-width="4"/>
-                    <text x="236" y="135" text-anchor="middle" fill="#121110" font-family="serif" font-weight="900" font-size="28">FUEL</text>
-                    <!-- ตัวตู้จ่ายน้ำมันสีแดงเลือดหมูตัดทอง -->
-                    <rect x="166" y="182" width="140" height="218" rx="18" fill="#8B0000" stroke="#D4AF37" stroke-width="10"/>
-                    <rect x="190" y="208" width="92" height="56" rx="8" fill="#F4EFE6" stroke="#D4AF37" stroke-width="4"/>
-                    <text x="236" y="244" text-anchor="middle" fill="#121110" font-family="monospace" font-weight="bold" font-size="26">1924</text>
-                    <!-- สายจ่ายน้ำมัน -->
-                    <path d="M306 230 H340 C358 230 370 242 370 260 V335 C370 352 384 365 400 365 C416 365 428 352 428 335 V200 L392 166" fill="none" stroke="#D4AF37" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-                    <!-- ฐานตู้ -->
-                    <rect x="140" y="400" width="192" height="24" rx="8" fill="#D4AF37"/>
-                </svg>
-            `.trim();
-
-            const iconDataUri = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(appIconSVG);
-
-            // ตั้งค่า Apple Touch Icon สำหรับ iOS
-            const appleIconLink = document.getElementById('apple-touch-icon');
-            if (appleIconLink) appleIconLink.href = iconDataUri;
-
-            // 2. สร้าง Dynamic Web App Manifest (Data URI)
-            const manifestObj = {
-                name: 'สถานีบริการน้ำมันยุค 1920s - ค้นหาปั๊มใกล้ฉัน',
-                short_name: 'ปั๊มใกล้ฉัน 20s',
-                description: 'ค้นหาปั๊มน้ำมันใกล้ฉัน ตรวจสอบราคาน้ำมันประจำวัน และนำทางสไตล์ยุค 1920s',
-                start_url: window.location.href,
-                display: 'standalone',
-                orientation: 'portrait',
-                theme_color: '#121110',
-                background_color: '#121110',
-                icons: [
-                    {
-                        src: iconDataUri,
-                        sizes: '192x192',
-                        type: 'image/svg+xml',
-                        purpose: 'any maskable'
-                    },
-                    {
-                        src: iconDataUri,
-                        sizes: '512x512',
-                        type: 'image/svg+xml',
-                        purpose: 'any maskable'
-                    }
-                ]
-            };
-
-            const manifestDataUri = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifestObj));
-            const manifestLink = document.getElementById('pwa-manifest');
-            if (manifestLink) manifestLink.href = manifestDataUri;
-
-            // 3. ลงทะเบียน Service Worker แบบ Inline (Blob URL) เพื่อให้รองรับการติดตั้งแบบ PWA
-            if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
-                const swCode = `
-                    const CACHE_NAME = 'gas-1920s-v2';
-                    self.addEventListener('install', (e) => {
-                        self.skipWaiting();
-                    });
-                    self.addEventListener('activate', (e) => {
-                        e.waitUntil(clients.claim());
-                    });
-                    self.addEventListener('fetch', (e) => {
-                        e.respondWith(
-                            fetch(e.request).catch(() => caches.match(e.request))
-                        );
-                    });
-                `;
-                try {
-                    const blob = new Blob([swCode], { type: 'application/javascript' });
-                    const swUrl = URL.createObjectURL(blob);
-                    navigator.serviceWorker.register(swUrl).catch(() => {});
-                } catch (err) {
-                    // ข้ามหากสภาพแวดล้อมบล็อก Blob Service Worker
-                }
-            }
-
-            // 4. ตรวจสอบสถานะการติดตั้ง (ซ่อนแบนเนอร์หากเปิดจากโหมด Standalone App แล้ว)
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-            if (isStandalone) return;
-
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const banner = document.getElementById('pwa-install-banner');
-
-            // ดักจับ event บน Android / Chrome / Edge
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredInstallPrompt = e;
-                banner.classList.remove('hidden');
-            });
-
-            // หากเป็น iOS Safari ให้แสดงแถบแนะนำปักหมุดลงหน้าจอโฮม
-            if (isIOS) {
-                document.getElementById('pwa-install-desc').textContent = 'แตะปุ่มด้านขวาเพื่อดูวิธีปักหมุดลงหน้าจอโฮม iPhone / iPad';
-                banner.classList.remove('hidden');
-            }
-
-            window.addEventListener('appinstalled', () => {
-                deferredInstallPrompt = null;
-                banner.classList.add('hidden');
-                showToast('🎉 ติดตั้งแอป "ปั๊มใกล้ฉัน 1920s" ลงหน้าจอโฮมเรียบร้อยแล้ว!');
-            });
-        }
-
-        /**
-         * กดปุ่มติดตั้งแอปลงหน้าจอโฮม
-         */
-        async function triggerPWAInstall() {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            if (deferredInstallPrompt) {
-                deferredInstallPrompt.prompt();
-                const { outcome } = await deferredInstallPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    document.getElementById('pwa-install-banner').classList.add('hidden');
-                }
-                deferredInstallPrompt = null;
-            } else if (isIOS) {
-                const modal = document.getElementById('ios-install-modal');
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            } else {
-                // กรณีเปิดผ่านเบราว์เซอร์ทั่วไปที่ยังไม่ส่ง event ให้แนะนำผ่านเมนูเบราว์เซอร์
-                showToast('แตะเมนูจุดสามจุด (⋮) มุมขวาบนของเบราว์เซอร์ แล้วเลือก "เพิ่มลงในหน้าจอหลัก"');
-            }
-        }
-
-        function dismissInstallBanner() {
-            document.getElementById('pwa-install-banner').classList.add('hidden');
-        }
-
-        function closeIOSModal() {
-            const modal = document.getElementById('ios-install-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        /**
-         * เปิด Modal ป้ายราคาน้ำมันยุค 1920s และเครื่องคำนวณ
-         */
-        function openFuelBoardModal(brandId = 'PTT', branchName = '') {
-            currentState.modalBrand = brandId;
-            const modal = document.getElementById('fuel-modal');
-            const titleEl = document.getElementById('modal-station-title');
-            
-            titleEl.textContent = branchName ? `ราคาน้ำมัน: ${branchName}` : `ป้ายราคาน้ำมัน (${PRICE_UPDATED_AT})`;
-            
-            renderModalBrandTabs();
-            renderFuelPriceTable(brandId);
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        /**
-         * ปิด Modal ป้ายราคาน้ำมัน
-         */
-        function closeFuelModal() {
-            const modal = document.getElementById('fuel-modal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        /**
-         * สร้างปุ่มสลับแบรนด์ภายใน Modal ป้ายราคาน้ำมัน
-         */
-        function renderModalBrandTabs() {
-            const container = document.getElementById('modal-brand-tabs');
-            container.innerHTML = '';
-
-            Object.values(BRANDS).filter(b => b.id !== 'ALL').forEach(brand => {
-                const isSelected = currentState.modalBrand === brand.id;
-                const btn = document.createElement('button');
-                btn.onclick = () => {
-                    currentState.modalBrand = brand.id;
-                    renderModalBrandTabs();
-                    renderFuelPriceTable(brand.id);
-                };
-                btn.className = `px-3 py-1.5 rounded-lg text-xs font-semibold border transition cursor-pointer ${
-                    isSelected 
-                    ? 'bg-decoGold text-decoBlack border-decoGold font-bold' 
-                    : 'bg-decoBlack text-decoCream border-decoGold/40 hover:border-decoGold'
-                }`;
-                btn.textContent = brand.name;
-                container.appendChild(btn);
-            });
-        }
-
-        /**
-         * แสดงตารางราคาน้ำมันของแบรนด์ที่เลือก และอัปเดตตัวเลือกในเครื่องคำนวณ
-         */
-        function renderFuelPriceTable(brandId) {
-            const brand = BRANDS[brandId] || BRANDS.PTT;
-            document.getElementById('modal-brand-badge').textContent = brand.id;
-            document.getElementById('modal-brand-fullname').textContent = brand.fullName;
-
-            const rowsContainer = document.getElementById('fuel-price-rows');
-            const calcSelect = document.getElementById('calc-fuel-type');
-            
-            rowsContainer.innerHTML = '';
-            calcSelect.innerHTML = '';
-
-            brand.prices.forEach((fuel, index) => {
-                // แถวแสดงราคาน้ำมันบนป้ายกระดาษครีม
-                const row = document.createElement('div');
-                row.className = 'flex items-center justify-between py-1.5 border-b border-decoBlack/10 last:border-none';
-                row.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <span class="font-semibold text-xs sm:text-sm text-decoBlack">${fuel.name}</span>
-                        ${fuel.tag ? `<span class="text-[10px] px-1.5 py-0.5 rounded font-bold ${fuel.tagColor}">${fuel.tag}</span>` : ''}
-                    </div>
-                    <div class="bg-decoBlack text-decoGold font-mono font-bold px-2.5 py-1 rounded text-sm sm:text-base tracking-wider shadow">
-                        ${fuel.price.toFixed(2)}
-                    </div>
-                `;
-                rowsContainer.appendChild(row);
-
-                // เพิ่มตัวเลือกในเครื่องคำนวณ
-                const opt = document.createElement('option');
-                opt.value = fuel.price;
-                opt.textContent = `${fuel.name} (${fuel.price.toFixed(2)} ฿/ลิตร)`;
-                if (index === 0) opt.selected = true;
-                calcSelect.appendChild(opt);
-            });
-
-            calculateFuel();
-        }
-
-        /**
-         * ตั้งค่าจำนวนเงินลัดในเครื่องคำนวณ
-         */
-        function setCalcAmount(amount) {
-            document.getElementById('calc-amount').value = amount;
-            calculateFuel();
-        }
-
-        /**
-         * คำนวณจำนวนลิตรจากจำนวนเงินและราคาน้ำมันที่เลือก
-         */
-        function calculateFuel() {
-            const pricePerLiter = parseFloat(document.getElementById('calc-fuel-type').value) || 0;
-            const amountBaht = parseFloat(document.getElementById('calc-amount').value) || 0;
-            
-            if (pricePerLiter > 0 && amountBaht > 0) {
-                const liters = amountBaht / pricePerLiter;
-                document.getElementById('calc-liters-result').textContent = liters.toFixed(2);
-            } else {
-                document.getElementById('calc-liters-result').textContent = '0.00';
-            }
-        }
-
-        // ปิด Modal เมื่อคลิกพื้นหลังสีดำ
-        document.getElementById('fuel-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeFuelModal();
-        });
-
-        document.getElementById('ios-install-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeIOSModal();
-        });
-
-        // เริ่มต้นทำงานเมื่อโหลดหน้าเว็บ
-        window.addEventListener('DOMContentLoaded', () => {
-            setupPWA();
-            currentState.stations = generateNearbyStations(
-                currentState.userLat,
-                currentState.userLng,
-                currentState.locationName
-            );
-            renderBrandFilters();
-            filterAndRenderStations();
-        });
-    </script>
+        if(!Object.keys(liveBrands).length) throw new Error('No prices');
+        const date=data?.response?.date;
+        document.getElementById('price-date').textContent=date?`อัปเดตล่าสุด ${date}`:'อัปเดตจากข้อมูลล่าสุด';
+        document.getElementById('price-source-note').textContent='ดึงข้อมูลจาก Thai Oil API • รายการอ้างอิงราคาขายปลีกไม่ใช่ราคาประจำสถานีทุกแห่ง';
+      }catch(e){
+        liveBrands=null;
+        document.getElementById('price-date').textContent='แสดงข้อมูลสำรอง — ยังไม่ได้เชื่อมต่อ API';
+        document.getElementById('price-source-note').textContent='ข้อมูลสำรองอาจไม่เป็นราคาปัจจุบัน กรุณาตรวจสอบป้ายหน้าปั๊ม';
+      }
+    }
+
+    function openPriceModal(brand){
+      if(brand&&FALLBACK_BRANDS[brand]) selectedBrand=brand;
+      const modal=document.getElementById('price-modal'); modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.classList.add('modal-open');
+      renderPriceModal();
+    }
+
+    function closePriceModal(){ const m=document.getElementById('price-modal'); m.classList.add('hidden'); m.classList.remove('flex'); document.body.classList.remove('modal-open'); }
+
+    function renderPriceModal(){
+      const source=liveBrands||FALLBACK_BRANDS;
+      document.getElementById('price-brand-tabs').innerHTML=Object.entries(source).map(([id,b])=>`
+        <button onclick="selectPriceBrand('${id}')" class="flex shrink-0 items-center gap-2 rounded-xl border px-3 py-2 text-sm ${selectedBrand===id?'border-blue-600 bg-blue-50 text-blue-700':'border-slate-200 bg-white text-slate-700'}">
+          ${brandMark(id,true)}<span>${b.name}</span>
+        </button>`).join('');
+      selectPriceBrand(selectedBrand);
+    }
+
+    function selectPriceBrand(id){
+      const source=liveBrands||FALLBACK_BRANDS;
+      if(!source[id]) id=Object.keys(source)[0];
+      selectedBrand=id;
+      const b=source[id];
+      document.getElementById('selected-price-brand').textContent=b.name;
+      document.getElementById('price-rows').innerHTML=b.prices.map(([name,price])=>`
+        <button onclick="chooseFuel('${String(name).replace(/'/g,'&#39;')}',${price})" class="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-slate-50">
+          <span class="pr-3 text-sm text-slate-700">${name}</span><strong class="text-base text-slate-900">${Number(price).toFixed(2)}</strong>
+        </button>`).join('');
+      renderPriceModalTabs();
+      const first=b.prices[0]; if(first) chooseFuel(first[0],first[1]);
+    }
+
+    function renderPriceModalTabs(){
+      const source=liveBrands||FALLBACK_BRANDS;
+      document.querySelectorAll('#price-brand-tabs button').forEach((btn,i)=>{
+        const id=Object.keys(source)[i]; btn.classList.toggle('border-blue-600',id===selectedBrand); btn.classList.toggle('bg-blue-50',id===selectedBrand); btn.classList.toggle('text-blue-700',id===selectedBrand);
+      });
+    }
+
+    function chooseFuel(name,price){
+      const select=document.getElementById('fuel-select');
+      const options=Array.from(select.options); const found=options.find(o=>o.value===String(price));
+      if(!found){ select.innerHTML=''; select.appendChild(new Option(name,String(price))); } else select.value=String(price);
+      calculateFuel();
+    }
+
+    function setAmount(amount){ document.getElementById('amount-input').value=amount; calculateFuel(); }
+
+    function calculateFuel(){
+      const source=liveBrands||FALLBACK_BRANDS;
+      const b=source[selectedBrand];
+      const select=document.getElementById('fuel-select');
+      if(!select.options.length&&b) select.innerHTML=b.prices.map(([n,p])=>`<option value="${p}">${n}</option>`).join('');
+      const price=Number(select.value), amount=Number(document.getElementById('amount-input').value);
+      document.getElementById('liters-result').textContent=(price>0&&amount>0?(amount/price).toFixed(2):'0.00');
+    }
+
+    function showToast(message){ const t=document.getElementById('toast'); t.textContent=message; t.classList.remove('hidden'); clearTimeout(t._timer); t._timer=setTimeout(()=>t.classList.add('hidden'),3500); }
+
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePriceModal(); });
+    generateStations(); renderBrands(); renderStations(); loadLivePrices();
+  </script>
 </body>
 </html>
