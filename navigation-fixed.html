@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#121110">
+  <title>Find-pump — นำทางไปยังปั๊มจริง</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: #121110; color: #f4efe6; font: 14px/1.5 system-ui, sans-serif; }
+    .notice { position: sticky; top: 0; z-index: 2; padding: 10px 16px; background: #1c1a17; border-bottom: 1px solid #d4af37; color: #f3e5ab; text-align: center; }
+    .notice strong { color: #d4af37; }
+    iframe { display: block; width: 100%; height: calc(100vh - 55px); min-height: 500px; border: 0; }
+  </style>
+</head>
+<body>
+  <div class="notice"><strong>แก้ไขการนำทาง:</strong> กดนำทางเพื่อค้นหาปั๊มน้ำมันจริงใกล้ตำแหน่งที่เลือกใน Google Maps</div>
+  <iframe id="pump-app" src="index.html" title="แอปค้นหาปั๊มน้ำมัน"></iframe>
+  <script>
+    const appFrame = document.getElementById('pump-app');
+
+    appFrame.addEventListener('load', () => {
+      const appDocument = appFrame.contentDocument;
+      appDocument.addEventListener('click', (event) => {
+        const mapLink = event.target.closest('a[href*="google.com/maps/dir"]');
+        if (!mapLink) return;
+
+        // The app's sample station coordinates are generated offsets, not verified pump locations.
+        // Search Maps around the user's selected location so they can navigate to a real station.
+        event.preventDefault();
+        let position = null;
+        try {
+          position = appFrame.contentWindow.eval('({ lat: currentState.userLat, lng: currentState.userLng })');
+        } catch (error) {
+          // If the app state is unavailable, fall back to a general gas-station search.
+        }
+
+        const card = mapLink.closest('article');
+        const brand = card?.querySelector('span')?.textContent?.trim() || '';
+        const query = [brand, 'ปั๊มน้ำมัน'].filter(Boolean).join(' ');
+        const search = position && Number.isFinite(position.lat) && Number.isFinite(position.lng)
+          ? `${query} ใกล้ ${position.lat},${position.lng}`
+          : query;
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(search)}`;
+        appFrame.contentWindow.open(mapsUrl, '_blank', 'noopener,noreferrer');
+      }, true);
+    });
+  </script>
+</body>
+</html>
