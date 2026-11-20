@@ -4,29 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#f6f7f9" />
-  <meta name="description" content="ค้นหาและเปรียบเทียบสถานีบริการน้ำมันในบริเวณของคุณ" />
+  <meta name="description" content="ค้นหาสถานีบริการน้ำมันจริงจาก OpenStreetMap และนำทางไปยังพิกัดสถานี" />
   <title>ปั๊มใกล้ฉัน</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    :root { --ink:#17212b; --muted:#667085; --line:#e6e9ee; --surface:#fff; --page:#f5f7fa; }
+    :root { --ink:#17212b; --line:#e6e9ee; --page:#f5f7fa; }
     * { box-sizing:border-box; }
     body { margin:0; background:var(--page); color:var(--ink); font-family:'Prompt',sans-serif; }
-    button, input, select { font:inherit; }
+    button,input,select { font:inherit; }
     button { cursor:pointer; }
-    .brand-logo { width:52px; height:52px; border-radius:16px; display:grid; place-items:center; background:#fff; border:1px solid var(--line); box-shadow:0 4px 12px rgba(16,24,40,.06); }
-    .brand-mark { font-weight:800; letter-spacing:-.04em; line-height:1; }
-    .ptt-mark { color:#fff; background:#1594d3; border-radius:50%; width:42px;height:42px;display:grid;place-items:center;font-size:13px; }
-    .bangchak-mark { color:#fff; background:#006c4e; border-radius:12px 12px 12px 4px; width:42px;height:42px;display:grid;place-items:center;font-size:10px; }
-    .shell-mark { color:#dd1d20; background:#ffd520; border:2px solid #dd1d20; border-radius:50%; width:42px;height:42px;display:grid;place-items:center;font-size:10px; }
-    .caltex-mark { color:#fff; background:#e11b22; clip-path:polygon(50% 0,100% 30%,82% 100%,18% 100%,0 30%); width:42px;height:42px;display:grid;place-items:center;font-size:9px; }
-    .pt-mark { color:#fff; background:#20a64b; width:42px;height:42px;display:grid;place-items:center;border-radius:8px;font-size:14px; }
-    .esso-mark { color:#fff; background:#ed1c24; border:3px solid #1a3c95; border-radius:50%; width:42px;height:42px;display:grid;place-items:center;font-size:9px; }
-    .all-mark { color:#344054; font-size:22px; }
+    .brand-logo { width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#fff;border:1px solid var(--line);box-shadow:0 4px 12px rgba(16,24,40,.06); }
+    .brand-mark { font-weight:800;letter-spacing:-.04em;line-height:1; }
+    .ptt-mark { color:#fff;background:#1594d3;border-radius:50%;width:42px;height:42px;display:grid;place-items:center;font-size:13px; }
+    .bangchak-mark { color:#fff;background:#006c4e;border-radius:12px 12px 12px 4px;width:42px;height:42px;display:grid;place-items:center;font-size:10px; }
+    .shell-mark { color:#dd1d20;background:#ffd520;border:2px solid #dd1d20;border-radius:50%;width:42px;height:42px;display:grid;place-items:center;font-size:10px; }
+    .caltex-mark { color:#fff;background:#e11b22;clip-path:polygon(50% 0,100% 30%,82% 100%,18% 100%,0 30%);width:42px;height:42px;display:grid;place-items:center;font-size:9px; }
+    .pt-mark { color:#fff;background:#20a64b;width:42px;height:42px;display:grid;place-items:center;border-radius:8px;font-size:14px; }
+    .esso-mark { color:#fff;background:#ed1c24;border:3px solid #1a3c95;border-radius:50%;width:42px;height:42px;display:grid;place-items:center;font-size:9px; }
+    .other-mark { color:#475467;background:#eef2f6;border-radius:50%;width:42px;height:42px;display:grid;place-items:center;font-size:20px; }
+    .all-mark { color:#344054;font-size:22px; }
     .station-card { transition:.18s ease; }
-    .station-card:hover { transform:translateY(-2px); box-shadow:0 12px 28px rgba(16,24,40,.08); }
+    .station-card:hover { transform:translateY(-2px);box-shadow:0 12px 28px rgba(16,24,40,.08); }
     .scrollbar-none::-webkit-scrollbar { display:none; }
     .scrollbar-none { scrollbar-width:none; }
     .modal-open { overflow:hidden; }
@@ -37,17 +38,12 @@
     <div class="mx-auto max-w-6xl px-4 py-3">
       <div class="flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-          <div class="grid h-11 w-11 place-items-center rounded-2xl bg-blue-600 text-white shadow-sm">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 22V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17"/><path d="M15 10h2a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L19.5 5.5"/><path d="M3 22h17"/><rect x="6" y="7" width="6" height="5" rx="1"/></svg>
+          <div class="grid h-11 w-11 place-items-center rounded-2xl bg-blue-600 text-white shadow-sm" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 22V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v17"/><path d="M15 10h2a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L19.5 5.5"/><path d="M3 22h17"/><rect x="6" y="7" width="6" height="5" rx="1"/></svg>
           </div>
-          <div>
-            <h1 class="text-lg font-bold leading-tight sm:text-xl">ปั๊มใกล้ฉัน</h1>
-            <p class="text-xs text-slate-500">ค้นหา • เปรียบเทียบ • นำทาง</p>
-          </div>
+          <div><h1 class="text-lg font-bold leading-tight sm:text-xl">ปั๊มใกล้ฉัน</h1><p class="text-xs text-slate-500">ค้นหาสถานีจริง • เปรียบเทียบ • นำทาง</p></div>
         </div>
-        <button onclick="openPriceModal()" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
-          ดูราคาน้ำมัน
-        </button>
+        <button onclick="openPriceModal()" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">ดูราคาน้ำมัน</button>
       </div>
     </div>
   </header>
@@ -56,18 +52,14 @@
     <section class="pt-5">
       <div class="grid gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:grid-cols-[1fr_auto]">
         <button id="gps-button" onclick="locateUser()" class="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
           <span id="gps-button-label">ใช้ตำแหน่งของฉัน</span>
         </button>
         <select id="area-select" onchange="changeArea(this.value)" class="min-h-12 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm outline-none focus:border-blue-500">
-          <option value="chonburi">หมอนนาง / พนัสนิคม</option>
-          <option value="bangkok">กรุงเทพฯ — สุขุมวิท</option>
-          <option value="chiangmai">เชียงใหม่ — คูเมือง</option>
-          <option value="phuket">ภูเก็ต — เมืองเก่า</option>
+          <option value="chonburi">หมอนนาง / พนัสนิคม</option><option value="bangkok">กรุงเทพฯ — สุขุมวิท</option><option value="chiangmai">เชียงใหม่ — คูเมือง</option><option value="phuket">ภูเก็ต — เมืองเก่า</option>
           <option value="gps" id="gps-option" disabled>ตำแหน่งปัจจุบันของคุณ</option>
         </select>
       </div>
-
       <div id="manual-location" class="mt-3 hidden rounded-2xl border border-amber-200 bg-amber-50 p-3">
         <p class="mb-2 text-sm text-amber-900">ระบุตำแหน่งเองได้หากเข้าถึง GPS ไม่สำเร็จ</p>
         <div class="grid gap-2 sm:grid-cols-3">
@@ -76,316 +68,190 @@
           <button onclick="applyManualLocation()" class="rounded-xl bg-amber-700 px-4 py-2.5 text-sm font-semibold text-white">ยืนยันตำแหน่ง</button>
         </div>
       </div>
-
-      <div class="mt-3 flex items-center gap-2 text-sm text-slate-500">
-        <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-        <span id="location-label">กำลังแสดงพื้นที่ หมอนนาง / พนัสนิคม</span>
-      </div>
+      <div class="mt-3 flex items-center gap-2 text-sm text-slate-500"><span class="h-2 w-2 rounded-full bg-emerald-500"></span><span id="location-label">ค้นหาสถานีจริงรอบพื้นที่ หมอนนาง / พนัสนิคม</span></div>
+      <p class="mt-1 text-xs text-slate-400">ตำแหน่งสถานีจาก OpenStreetMap; ความครอบคลุมขึ้นอยู่กับข้อมูลที่ผู้ร่วมแก้ไขได้บันทึกไว้</p>
     </section>
 
     <section class="mt-5">
-      <div class="mb-3 flex items-end justify-between">
-        <div>
-          <h2 class="font-bold">เลือกตราสถานี</h2>
-          <p class="text-xs text-slate-500">แตะเพื่อกรองผลลัพธ์</p>
-        </div>
-        <button id="reset-filter" onclick="resetFilters()" class="hidden text-sm font-semibold text-blue-600">ล้างตัวกรอง</button>
-      </div>
+      <div class="mb-3 flex items-end justify-between"><div><h2 class="font-bold">เลือกตราสถานี</h2><p class="text-xs text-slate-500">แตะเพื่อกรองผลลัพธ์</p></div><button id="reset-filter" onclick="resetFilters()" class="hidden text-sm font-semibold text-blue-600">ล้างตัวกรอง</button></div>
       <div id="brand-grid" class="scrollbar-none grid grid-cols-4 gap-2 overflow-x-auto sm:grid-cols-7"></div>
     </section>
 
     <section class="mt-4 grid gap-3 sm:grid-cols-[1fr_180px]">
-      <label class="relative">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-        <input id="search-input" oninput="renderStations()" type="search" placeholder="ค้นหาชื่อสาขา หรือถนน" class="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm outline-none focus:border-blue-500" />
-      </label>
-      <select id="radius-select" onchange="renderStations()" class="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-blue-500">
-        <option value="999">ระยะทาง: ทั้งหมด</option>
-        <option value="3">ไม่เกิน 3 กม.</option>
-        <option value="5">ไม่เกิน 5 กม.</option>
-        <option value="10">ไม่เกิน 10 กม.</option>
-      </select>
+      <label class="relative"><svg class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="search-input" oninput="renderStations()" type="search" placeholder="ค้นหาชื่อสถานี หรือถนน" class="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm outline-none focus:border-blue-500" /></label>
+      <select id="radius-select" onchange="loadStations()" class="rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-blue-500"><option value="5000">รัศมี 5 กม.</option><option value="10000" selected>รัศมี 10 กม.</option><option value="20000">รัศมี 20 กม. (ทั้งหมด)</option></select>
     </section>
 
     <section class="mt-5">
-      <div class="mb-3 flex items-center justify-between">
-        <p class="text-sm text-slate-500">พบ <strong id="station-count" class="text-slate-900">0</strong> สถานี</p>
-        <button onclick="openPriceModal()" class="text-sm font-semibold text-blue-600">ดูราคาทั้งหมด</button>
-      </div>
-      <div id="stations-list" class="grid gap-3 md:grid-cols-2"></div>
+      <div class="mb-3 flex items-center justify-between"><p class="text-sm text-slate-500">พบ <strong id="station-count" class="text-slate-900">0</strong> สถานีจริง</p><button onclick="openPriceModal()" class="text-sm font-semibold text-blue-600">ดูราคาน้ำมัน</button></div>
+      <div id="stations-list" class="grid gap-3 md:grid-cols-2" aria-live="polite"></div>
+      <p class="mt-4 text-center text-xs text-slate-400">แผนที่และข้อมูล © <a class="underline" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a></p>
     </section>
   </main>
 
-  <div id="price-modal" class="fixed inset-0 z-50 hidden items-end justify-center bg-slate-950/50 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true">
+  <div id="price-modal" class="fixed inset-0 z-50 hidden items-end justify-center bg-slate-950/50 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="dialog" aria-modal="true" aria-labelledby="price-title">
     <div class="max-h-[92vh] w-full max-w-xl overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:rounded-3xl">
-      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-        <div>
-          <h2 class="font-bold">ราคาน้ำมันปัจจุบัน</h2>
-          <p id="price-date" class="mt-0.5 text-xs text-slate-500">กำลังโหลดข้อมูล...</p>
-        </div>
-        <button onclick="closePriceModal()" class="grid h-9 w-9 place-items-center rounded-full bg-slate-100 text-slate-600" aria-label="ปิด">✕</button>
-      </div>
+      <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4"><div><h2 id="price-title" class="font-bold">ราคาน้ำมันอ้างอิง</h2><p id="price-date" class="mt-0.5 text-xs text-slate-500">กำลังโหลดข้อมูล...</p></div><button onclick="closePriceModal()" class="grid h-9 w-9 place-items-center rounded-full bg-slate-100 text-slate-600" aria-label="ปิด">✕</button></div>
       <div class="max-h-[calc(92vh-73px)] overflow-y-auto p-4">
         <div id="price-brand-tabs" class="scrollbar-none mb-4 flex gap-2 overflow-x-auto"></div>
-        <div class="rounded-2xl border border-slate-200">
-          <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-            <strong id="selected-price-brand">ปตท.</strong>
-            <span class="text-xs text-slate-500">บาท / ลิตร</span>
-          </div>
-          <div id="price-rows" class="divide-y divide-slate-100"></div>
-        </div>
-
-        <div class="mt-4 rounded-2xl bg-slate-50 p-4">
-          <h3 class="mb-3 font-semibold">คำนวณค่าใช้จ่าย</h3>
-          <div class="grid gap-3 sm:grid-cols-2">
-            <select id="fuel-select" onchange="calculateFuel()" class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none"></select>
-            <input id="amount-input" type="number" value="500" min="1" oninput="calculateFuel()" class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none" placeholder="จำนวนเงิน (บาท)" />
-          </div>
-          <div class="mt-3 flex gap-2">
-            <button onclick="setAmount(300)" class="flex-1 rounded-lg border border-slate-200 bg-white py-2 text-xs">300 ฿</button>
-            <button onclick="setAmount(500)" class="flex-1 rounded-lg border border-slate-200 bg-white py-2 text-xs">500 ฿</button>
-            <button onclick="setAmount(1000)" class="flex-1 rounded-lg border border-slate-200 bg-white py-2 text-xs">1,000 ฿</button>
-          </div>
-          <div class="mt-4 flex items-end justify-between border-t border-slate-200 pt-4">
-            <span class="text-sm text-slate-500">ประมาณการน้ำมัน</span>
-            <div><strong id="liters-result" class="text-2xl text-blue-700">0.00</strong> <span class="text-sm">ลิตร</span></div>
-          </div>
-        </div>
-        <p id="price-source-note" class="mt-3 text-center text-xs text-slate-400">ข้อมูลอ้างอิงราคาขายปลีก กรุงเทพมหานครและปริมณฑล</p>
+        <div class="rounded-2xl border border-slate-200"><div class="flex items-center justify-between border-b border-slate-100 px-4 py-3"><strong id="selected-price-brand">ปตท.</strong><span class="text-xs text-slate-500">บาท / ลิตร</span></div><div id="price-rows" class="divide-y divide-slate-100"></div></div>
+        <div class="mt-4 rounded-2xl bg-slate-50 p-4"><h3 class="mb-3 font-semibold">คำนวณค่าใช้จ่าย</h3><div class="grid gap-3 sm:grid-cols-2"><select id="fuel-select" onchange="calculateFuel()" class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none"></select><input id="amount-input" type="number" value="500" min="1" oninput="calculateFuel()" class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none" placeholder="จำนวนเงิน (บาท)" /></div><div class="mt-3 flex gap-2"><button onclick="setAmount(300)" class="flex-1 rounded-lg border border-slate-200 bg-white py-2 text-xs">300 ฿</button><button onclick="setAmount(500)" class="flex-1 rounded-lg border border-slate-200 bg-white py-2 text-xs">500 ฿</button><button onclick="setAmount(1000)" class="flex-1 rounded-lg border border-slate-200 bg-white py-2 text-xs">1,000 ฿</button></div><div class="mt-4 flex items-end justify-between border-t border-slate-200 pt-4"><span class="text-sm text-slate-500">ประมาณการน้ำมัน</span><div><strong id="liters-result" class="text-2xl text-blue-700">0.00</strong> <span class="text-sm">ลิตร</span></div></div></div>
+        <p id="price-source-note" class="mt-3 text-center text-xs text-slate-400">ราคาขายปลีกอ้างอิง ไม่ใช่ราคาประจำสาขา</p>
       </div>
     </div>
   </div>
-
-  <div id="toast" class="fixed left-1/2 top-4 z-[60] hidden -translate-x-1/2 rounded-xl bg-slate-900 px-4 py-3 text-center text-sm text-white shadow-xl"></div>
+  <div id="toast" class="fixed left-1/2 top-4 z-[60] hidden -translate-x-1/2 rounded-xl bg-slate-900 px-4 py-3 text-center text-sm text-white shadow-xl" role="status"></div>
 
   <script>
-    const API_URL = 'https://api.chnwt.dev/thai-oil-api/latest';
-    const FALLBACK_BRANDS = {
-      ptt:{ name:'ปตท.', mark:'ptt', prices:[['แก๊สโซฮอล์ 95',38.14],['แก๊สโซฮอล์ 91',37.77],['แก๊สโซฮอล์ E20',30.10],['แก๊สโซฮอล์ E85',31.89],['ดีเซล B7',32.94],['เบนซิน 95',46.79]] },
-      bcp:{ name:'บางจาก', mark:'bangchak', prices:[['แก๊สโซฮอล์ 95',38.14],['แก๊สโซฮอล์ 91',37.77],['แก๊สโซฮอล์ E20',30.10],['ดีเซล B7',32.94],['ไฮพรีเมียม 97',52.34]] },
-      shell:{ name:'เชลล์', mark:'shell', prices:[['ฟิวเซฟ แก๊สโซฮอล์ 95',38.64],['ฟิวเซฟ แก๊สโซฮอล์ 91',38.27],['แก๊สโซฮอล์ E20',30.60],['ดีเซล B7',32.94],['วี-เพาเวอร์ ดีเซล',56.89]] },
-      caltex:{ name:'คาลเท็กซ์', mark:'caltex', prices:[['แก๊สโซฮอล์ 95',38.14],['แก๊สโซฮอล์ 91',37.77],['แก๊สโซฮอล์ E20',30.10],['ดีเซล B7',32.94],['พาวเวอร์ ดีเซล',53.19]] },
-      pt:{ name:'พีที', mark:'pt', prices:[['แก๊สโซฮอล์ 95',38.14],['แก๊สโซฮอล์ 91',37.77],['แก๊สโซฮอล์ E20',30.10],['ดีเซล B7',32.94],['เบนซิน 95',47.29]] },
-      esso:{ name:'เอสโซ่', mark:'esso', prices:[['แก๊สโซฮอล์ 95',38.14],['แก๊สโซฮอล์ 91',37.77],['แก๊สโซฮอล์ E20',30.10],['ดีเซล B7',32.94],['ซูพรีม พลัส ดีเซล',54.19]] }
+    const OVERPASS_ENDPOINTS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter'];
+    const PRICE_API_URL = 'https://api.chnwt.dev/thai-oil-api/latest';
+    const BRANDS = {
+      ptt:{name:'ปตท.',mark:'ptt'}, bcp:{name:'บางจาก',mark:'bcp'}, shell:{name:'เชลล์',mark:'shell'},
+      caltex:{name:'คาลเท็กซ์',mark:'caltex'}, pt:{name:'พีที',mark:'pt'}, esso:{name:'เอสโซ่ / Mobil',mark:'esso'}, other:{name:'แบรนด์อื่น',mark:'other'}
     };
-
-    let liveBrands = null;
-    let selectedBrand = 'ptt';
-    let selectedFilter = 'ALL';
-
-    const areas = {
-      chonburi:{ name:'หมอนนาง / พนัสนิคม', lat:13.4385, lng:101.2140 },
-      bangkok:{ name:'กรุงเทพฯ — สุขุมวิท', lat:13.7367, lng:100.5604 },
-      chiangmai:{ name:'เชียงใหม่ — คูเมือง', lat:18.7883, lng:98.9853 },
-      phuket:{ name:'ภูเก็ต — เมืองเก่า', lat:7.8848, lng:98.3883 }
+    const AREAS = {
+      chonburi:{name:'หมอนนาง / พนัสนิคม',lat:13.4385,lon:101.2140},
+      bangkok:{name:'กรุงเทพฯ — สุขุมวิท',lat:13.7367,lon:100.5604},
+      chiangmai:{name:'เชียงใหม่ — คูเมือง',lat:18.7883,lon:98.9853},
+      phuket:{name:'ภูเก็ต — เมืองเก่า',lat:7.8848,lon:98.3883}
     };
+    let state={lat:AREAS.chonburi.lat,lon:AREAS.chonburi.lon,name:AREAS.chonburi.name,stations:[]};
+    let selectedFilter='ALL', livePrices=null, selectedPriceBrand='ptt', stationRequest=0;
+    let stationLoadError='';
 
-    let state = { lat:areas.chonburi.lat, lng:areas.chonburi.lng, name:areas.chonburi.name, stations:[] };
+    function escapeHTML(value){return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
+    function haversine(lat1,lon1,lat2,lon2){const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180,a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;return +(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(2);}
 
-    const templates = [
-      {brand:'ptt',branch:'ปตท. แยกหมอนนาง',road:'ถนนสุขประยูร',dLat:.0065,dLng:.0042,open:'เปิด 24 ชั่วโมง',amenities:['Cafe Amazon','EV Charger','ห้องน้ำ']},
-      {brand:'bcp',branch:'บางจาก พนัสนิคม กม.24',road:'ถนนพนัสนิคม-ฉะเชิงเทรา',dLat:-.011,dLng:.0085,open:'05:00–23:00',amenities:['อินทนิล','Mini Big C']},
-      {brand:'shell',branch:'เชลล์ ถนนเลี่ยงเมือง',road:'ถนนบายพาสสายตะวันออก',dLat:.0145,dLng:-.012,open:'เปิด 24 ชั่วโมง',amenities:['Shell Café','บริการล้างรถ']},
-      {brand:'pt',branch:'พีที บ้านบึง-พนัส',road:'ถนนสาย 349',dLat:-.0185,dLng:-.0095,open:'05:30–22:30',amenities:['กาแฟพันธุ์ไทย','ร้านสะดวกซื้อ']},
-      {brand:'caltex',branch:'คาลเท็กซ์ ประตูเมืองตะวันออก',road:'ถนนสุขุมวิทสายเก่า',dLat:.024,dLng:.019,open:'06:00–22:00',amenities:['ล้างรถ','ห้องน้ำ']},
-      {brand:'ptt',branch:'ปตท. ทางหลวง 331',road:'ถนนสัตหีบ-พนมสารคาม',dLat:-.031,dLng:.025,open:'เปิด 24 ชั่วโมง',amenities:['Cafe Amazon','Jiffy']},
-      {brand:'esso',branch:'เอสโซ่ แยกดอนหัวฬ่อ',road:'ถนนดอนหัวฬ่อ-อมตะ',dLat:.038,dLng:-.029,open:'เปิด 24 ชั่วโมง',amenities:['Lotus go fresh','ลมยาง']},
-      {brand:'bcp',branch:'บางจาก คลองหลวง-นิคมฯ',road:'ถนนเลียบคลองชลประทาน',dLat:.049,dLng:.036,open:'05:00–23:30',amenities:['EV Charger','ร้านสะดวกซื้อ']}
-    ];
-
-    function distance(lat1,lng1,lat2,lng2){
-      const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLng=(lng2-lng1)*Math.PI/180;
-      const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
-      return +(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(2);
+    function brandFor(tags){
+      const text=[tags.brand,tags.operator,tags.name,tags['name:th']].filter(Boolean).join(' ').toLowerCase();
+      if(/ptt|ปตท|ปตท\./i.test(text)) return 'ptt';
+      if(/bangchak|บางจาก/i.test(text)) return 'bcp';
+      if(/shell|เชลล์/i.test(text)) return 'shell';
+      if(/caltex|คาลเท็กซ์/i.test(text)) return 'caltex';
+      if(/(^|\W)pt(\W|$)|พีที|พี\.ที\./i.test(text)) return 'pt';
+      if(/esso|เอสโซ่|mobil|โมบิล/i.test(text)) return 'esso';
+      return 'other';
     }
-
-    function generateStations(){
-      state.stations=templates.map((t,i)=>({
-        ...t,id:i+1,lat:state.lat+t.dLat,lng:state.lng+t.dLng,
-        distance:distance(state.lat,state.lng,state.lat+t.dLat,state.lng+t.dLng)
-      })).sort((a,b)=>a.distance-b.distance);
+    function brandLabel(id){return BRANDS[id]?.name||BRANDS.other.name;}
+    function brandMark(id){
+      const cls='brand-mark';
+      if(id==='ptt')return `<span class="${cls} ptt-mark">PTT</span>`;
+      if(id==='bcp')return `<span class="${cls} bangchak-mark">บางจาก</span>`;
+      if(id==='shell')return `<span class="${cls} shell-mark">Shell</span>`;
+      if(id==='caltex')return `<span class="${cls} caltex-mark">Caltex</span>`;
+      if(id==='pt')return `<span class="${cls} pt-mark">PT</span>`;
+      if(id==='esso')return `<span class="${cls} esso-mark">ESSO</span>`;
+      return id==='ALL'?'<span class="all-mark">★</span>':'<span class="other-mark">⛽</span>';
     }
-
-    function brandMark(id, small=false){
-      const cls=small?'brand-mark':'brand-mark';
-      if(id==='ptt') return `<span class="${cls} ptt-mark">PTT</span>`;
-      if(id==='bcp') return `<span class="${cls} bangchak-mark">บางจาก</span>`;
-      if(id==='shell') return `<span class="${cls} shell-mark">Shell</span>`;
-      if(id==='caltex') return `<span class="${cls} caltex-mark">Caltex</span>`;
-      if(id==='pt') return `<span class="${cls} pt-mark">PT</span>`;
-      if(id==='esso') return `<span class="${cls} esso-mark">ESSO</span>`;
-      return `<span class="all-mark">★</span>`;
-    }
-
     function renderBrands(){
-      const brands=[['ALL','ทั้งหมด','all'],...Object.entries(FALLBACK_BRANDS).map(([id,b])=>[id,b.name,id])];
-      document.getElementById('brand-grid').innerHTML=brands.map(([id,name,mark])=>`
-        <button onclick="selectBrand('${id}')" class="flex min-h-[82px] flex-col items-center justify-center rounded-2xl border p-2 transition ${selectedFilter===id?'border-blue-600 bg-blue-50':'border-slate-200 bg-white'}">
-          <span class="brand-logo mb-1.5 !h-12 !w-12">${id==='ALL'?brandMark('ALL'):brandMark(id)}</span>
-          <span class="max-w-full truncate text-[11px] font-medium ${selectedFilter===id?'text-blue-700':'text-slate-700'}">${name}</span>
-        </button>`).join('');
+      const options=[['ALL','ทั้งหมด'],...Object.entries(BRANDS).map(([id,b])=>[id,b.name])];
+      document.getElementById('brand-grid').innerHTML=options.map(([id,name])=>`<button onclick="selectBrand('${id}')" class="flex min-h-[82px] flex-col items-center justify-center rounded-2xl border p-2 transition ${selectedFilter===id?'border-blue-600 bg-blue-50':'border-slate-200 bg-white'}"><span class="brand-logo mb-1.5 !h-12 !w-12">${brandMark(id)}</span><span class="max-w-full truncate text-[11px] font-medium ${selectedFilter===id?'text-blue-700':'text-slate-700'}">${escapeHTML(name)}</span></button>`).join('');
     }
+    function selectBrand(id){selectedFilter=id;renderBrands();renderStations();}
 
-    function selectBrand(id){ selectedFilter=id; renderBrands(); renderStations(); }
-
+    function showStationMessage(message,detail=''){
+      document.getElementById('station-count').textContent='0';
+      document.getElementById('stations-list').innerHTML=`<div class="col-span-full rounded-2xl border ${detail?'border-amber-200':'border-dashed border-slate-300'} bg-white px-5 py-10 text-center"><p class="font-semibold text-slate-700">${escapeHTML(message)}</p>${detail?`<p class="mt-2 text-sm text-slate-500">${escapeHTML(detail)}</p>`:''}</div>`;
+    }
     function renderStations(){
-      const q=document.getElementById('search-input').value.trim().toLowerCase();
-      const radius=Number(document.getElementById('radius-select').value);
-      const filtered=state.stations.filter(s=>
-        (selectedFilter==='ALL'||s.brand===selectedFilter)&&s.distance<=radius&&
-        (!q||(s.branch+s.road+(s.amenities||[]).join(' ')).toLower().includes(q))
-      );
+      const query=document.getElementById('search-input').value.trim().toLocaleLowerCase('th');
+      const radius=Number(document.getElementById('radius-select').value)/1000;
+      const filtered=state.stations.filter(s=>(selectedFilter==='ALL'||s.brand===selectedFilter)&&s.distance<=radius&&(!query||`${s.name} ${s.brandName} ${s.operator} ${s.address}`.toLocaleLowerCase('th').includes(query)));
       document.getElementById('station-count').textContent=filtered.length;
-      document.getElementById('reset-filter').classList.toggle('hidden',selectedFilter==='ALL'&&!q);
+      document.getElementById('reset-filter').classList.toggle('hidden',selectedFilter==='ALL'&&!query);
       const list=document.getElementById('stations-list');
-      if(!filtered.length){ list.innerHTML=`<div class="col-span-full rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center text-sm text-slate-500">ไม่พบสถานีตามเงื่อนไขที่เลือก</div>`; return; }
+      if(stationLoadError){showStationMessage('โหลดข้อมูลสถานีจริงไม่สำเร็จ',stationLoadError);return;}
+      if(!state.stations.length){showStationMessage('ไม่พบสถานีที่มีพิกัดใน OpenStreetMap รอบตำแหน่งนี้','ลองขยายรัศมี หรือเปลี่ยนพื้นที่ค้นหา ข้อมูลบางบริเวณอาจยังมีสถานีไม่ครบ');return;}
+      if(!filtered.length){showStationMessage('ไม่พบสถานีตามตัวกรองที่เลือก','ลองเปลี่ยนแบรนด์ คำค้นหา หรือขยายรัศมี');return;}
       list.innerHTML=filtered.map(s=>{
-        const b=FALLBACK_BRANDS[s.brand];
-        const mapUrl=`https://www.google.com/maps/dir/?api=1&destination=${s.lat},${s.lng}`;
-        return `<article class="station-card rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div class="flex gap-3">
-            ${brandMark(s.brand)}
-            <div class="min-w-0 flex-1">
-              <div class="flex items-start justify-between gap-2">
-                <div><h3 class="font-bold leading-snug">${s.branch}</h3><p class="mt-1 text-xs text-slate-500">${s.road}</p></div>
-                <span class="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">${s.distance} กม.</span>
-              </div>
-              <div class="mt-3 flex flex-wrap gap-1.5">
-                <span class="rounded-md bg-emerald-50 px-2 py-1 text-xs text-emerald-700">${s.open}</span>
-                ${s.amenities.slice(0,3).map(x=>`<span class="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600">${x}</span>`).join('')}
-              </div>
-            </div>
-          </div>
-          <div class="mt-4 grid grid-cols-2 gap-2">
-            <button onclick="openPriceModal('${s.brand}')" class="rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">ดูราคา ${b.name}</button>
-            <a href="${mapUrl}" target="_blank" rel="noopener" class="rounded-xl bg-blue-600 px-3 py-2.5 text-center text-sm font-semibold text-white hover:bg-blue-700">เส้นทาง</a>
-          </div>
-        </article>`;
+        const sourceUrl=`https://www.openstreetmap.org/${encodeURIComponent(s.type)}/${encodeURIComponent(s.id)}`;
+        const mapsUrl=`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${s.lat},${s.lon}`)}&travelmode=driving`;
+        return `<article class="station-card rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><div class="flex gap-3"><span class="brand-logo shrink-0">${brandMark(s.brand)}</span><div class="min-w-0 flex-1"><div class="flex items-start justify-between gap-2"><div class="min-w-0"><h3 class="font-bold leading-snug">${escapeHTML(s.name)}</h3><p class="mt-1 text-xs text-slate-500">${escapeHTML(s.address||s.operator||brandLabel(s.brand))}</p><p class="mt-1 text-xs font-medium text-slate-500">${escapeHTML(brandLabel(s.brand))}</p></div><span class="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">${s.distance.toFixed(2)} กม.</span></div></div></div><div class="mt-4 grid grid-cols-2 gap-2"><a href="${mapsUrl}" target="_blank" rel="noopener noreferrer" class="rounded-xl bg-blue-600 px-3 py-2.5 text-center text-sm font-semibold text-white hover:bg-blue-700">นำทางไปพิกัดสถานี</a><a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" class="rounded-xl border border-slate-200 px-3 py-2.5 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50">ตรวจสอบแผนที่ OSM</a></div></article>`;
       }).join('');
     }
+    function resetFilters(){selectedFilter='ALL';document.getElementById('search-input').value='';renderBrands();renderStations();}
 
-    function resetFilters(){ selectedFilter='ALL'; document.getElementById('search-input').value=''; renderBrands(); renderStations(); }
-
-    function changeArea(id){
-      if(id==='gps') return;
-      const a=areas[id]; state.lat=a.lat; state.lng=a.lng; state.name=a.name;
-      document.getElementById('location-label').textContent=`กำลังแสดงพื้นที่ ${a.name}`;
-      generateStations(); renderStations();
+    async function requestOverpass(endpoint,query,signal){
+      const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8','Accept':'application/json'},body:`data=${encodeURIComponent(query)}`,signal});
+      if(!response.ok)throw new Error(`แหล่งข้อมูลตอบกลับ ${response.status}`);
+      return response.json();
     }
-
+    function normalizeStation(element){
+      const tags=element.tags||{};
+      if(tags.amenity!=='fuel')return null;
+      const lat=Number(element.lat??element.center?.lat),lon=Number(element.lon??element.center?.lon);
+      if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat<-90||lat>90||lon<-180||lon>180)return null;
+      const brand=brandFor(tags);
+      const brandName=tags.brand||tags.operator||brandLabel(brand);
+      const name=tags['name:th']||tags.name||tags.brand||tags.operator||'สถานีบริการน้ำมัน (ไม่มีชื่อใน OpenStreetMap)';
+      const address=[tags['addr:subdistrict'],tags['addr:district'],tags['addr:province']].filter(Boolean).join(' ');
+      return {id:element.id,type:element.type,lat,lon,brand,brandName,name,operator:tags.operator||'',address,distance:haversine(state.lat,state.lon,lat,lon)};
+    }
+    async function loadStations(){
+      const requestId=++stationRequest;
+      const radius=Number(document.getElementById('radius-select').value);
+      const query=`[out:json][timeout:25];(node["amenity"="fuel"](around:${radius},${state.lat},${state.lon});way["amenity"="fuel"](around:${radius},${state.lat},${state.lon});relation["amenity"="fuel"](around:${radius},${state.lat},${state.lon}););out center tags;`;
+      stationLoadError='';state.stations=[];showStationMessage('กำลังค้นหาสถานีจริงจาก OpenStreetMap…');
+      const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),30000);
+      let lastError;
+      try{
+        for(const endpoint of OVERPASS_ENDPOINTS){
+          try{
+            const data=await requestOverpass(endpoint,query,controller.signal);
+            if(requestId!==stationRequest)return;
+            const elements=Array.isArray(data.elements)?data.elements:[];
+            state.stations=elements.map(normalizeStation).filter(Boolean).sort((a,b)=>a.distance-b.distance);
+            renderStations();return;
+          }catch(error){lastError=error;if(controller.signal.aborted)break;}
+        }
+        if(requestId!==stationRequest)return;
+        stationLoadError=controller.signal.aborted?'การค้นหาใช้เวลานานเกินไป กรุณาลองอีกครั้ง':'เชื่อมต่อบริการ OpenStreetMap ไม่สำเร็จ กรุณาลองใหม่ภายหลัง';
+        renderStations();
+      }finally{clearTimeout(timeout);}
+    }
+    function changeArea(id){if(id==='gps'||!AREAS[id])return;const area=AREAS[id];state.lat=area.lat;state.lon=area.lon;state.name=area.name;document.getElementById('location-label').textContent=`ค้นหาสถานีจริงรอบพื้นที่ ${area.name}`;loadStations();}
     function locateUser(){
       const label=document.getElementById('gps-button-label');
-      if(!navigator.geolocation){ document.getElementById('manual-location').classList.remove('hidden'); showToast('เบราว์เซอร์นี้ไม่รองรับ GPS'); return; }
-      label.textContent='กำลังค้นหาตำแหน่ง...';
-      navigator.geolocation.getCurrentPosition(pos=>applyLocation(pos.coords.latitude,pos.coords.longitude,'ตำแหน่งปัจจุบัน'),()=>{
-        label.textContent='ใช้ตำแหน่งของฉัน';
-        document.getElementById('manual-location').classList.remove('hidden');
-        showToast('เข้าถึง GPS ไม่สำเร็จ กรุณาระบุตำแหน่งเอง');
-      },{enableHighAccuracy:true,timeout:8000,maximumAge:30000});
+      if(!navigator.geolocation){document.getElementById('manual-location').classList.remove('hidden');showToast('เบราว์เซอร์นี้ไม่รองรับ GPS');return;}
+      label.textContent='กำลังค้นหาตำแหน่ง…';
+      navigator.geolocation.getCurrentPosition(pos=>applyLocation(pos.coords.latitude,pos.coords.longitude,'ตำแหน่งปัจจุบัน'),()=>{label.textContent='ใช้ตำแหน่งของฉัน';document.getElementById('manual-location').classList.remove('hidden');showToast('เข้าถึง GPS ไม่สำเร็จ กรุณาระบุตำแหน่งเอง');},{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
     }
-
-    function applyLocation(lat,lng,name){
-      state.lat=lat; state.lng=lng; state.name=name;
-      const opt=document.getElementById('gps-option'); opt.disabled=false; opt.textContent=`📍 ${name}`;
-      document.getElementById('area-select').value='gps';
-      document.getElementById('location-label').textContent=`กำลังแสดงรอบพิกัด ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-      document.getElementById('manual-location').classList.add('hidden');
-      document.getElementById('gps-button-label').textContent='อัปเดตตำแหน่งแล้ว';
-      generateStations(); renderStations();
+    function applyLocation(lat,lon,name){
+      if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat<-90||lat>90||lon<-180||lon>180){showToast('พิกัดไม่ถูกต้อง');return;}
+      state.lat=lat;state.lon=lon;state.name=name;
+      const option=document.getElementById('gps-option');option.disabled=false;option.textContent=`📍 ${name}`;document.getElementById('area-select').value='gps';
+      document.getElementById('location-label').textContent=`ค้นหาสถานีจริงรอบพิกัด ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+      document.getElementById('manual-location').classList.add('hidden');document.getElementById('gps-button-label').textContent='อัปเดตตำแหน่งแล้ว';loadStations();
     }
-
-    function applyManualLocation(){
-      const lat=Number(document.getElementById('manual-lat').value), lng=Number(document.getElementById('manual-lng').value);
-      if(!Number.isFinite(lat)||!Number.isFinite(lng)||lat<-90||lat>90||lng<-180||lng>180){ showToast('กรุณากรอกพิกัดให้ถูกต้อง'); return; }
-      applyLocation(lat,lng,'ตำแหน่งที่ระบุ');
-    }
+    function applyManualLocation(){const lat=Number(document.getElementById('manual-lat').value),lon=Number(document.getElementById('manual-lng').value);if(!document.getElementById('manual-lat').value||!document.getElementById('manual-lng').value){showToast('กรุณากรอกละติจูดและลองจิจูด');return;}applyLocation(lat,lon,'ตำแหน่งที่ระบุ');}
 
     async function loadLivePrices(){
       try{
-        const res=await fetch(API_URL,{headers:{'Accept':'application/json'}});
-        if(!res.ok) throw new Error('HTTP '+res.status);
-        const data=await res.json();
-        const stations=data?.response?.stations;
-        if(!stations) throw new Error('Invalid response');
-        liveBrands={};
-        const names={ptt:'ปตท.',bcp:'บางจาก',shell:'เชลล์',caltex:'คาลเท็กซ์',pt:'พีที',esso:'เอสโซ่'};
-        const marks={ptt:'ptt',bcp:'bangchak',shell:'shell',caltex:'caltex',pt:'pt',esso:'esso'};
-        for(const [id,products] of Object.entries(stations)){
-          if(!names[id]) continue;
-          const prices=Object.values(products).filter(p=>p&&p.name&&p.price).map(p=>[p.name,Number(p.price)]).filter(p=>Number.isFinite(p[1])&&p[1]>0);
-          if(prices.length) liveBrands[id]={name:names[id],mark:marks[id],prices};
-        }
-        if(!Object.keys(liveBrands).length) throw new Error('No prices');
-        const date=data?.response?.date;
-        document.getElementById('price-date').textContent=date?`อัปเดตล่าสุด ${date}`:'อัปเดตจากข้อมูลล่าสุด';
-        document.getElementById('price-source-note').textContent='ดึงข้อมูลจาก Thai Oil API • รายการอ้างอิงราคาขายปลีกไม่ใช่ราคาประจำสถานีทุกแห่ง';
-      }catch(e){
-        liveBrands=null;
-        document.getElementById('price-date').textContent='แสดงข้อมูลสำรอง — ยังไม่ได้เชื่อมต่อ API';
-        document.getElementById('price-source-note').textContent='ข้อมูลสำรองอาจไม่เป็นราคาปัจจุบัน กรุณาตรวจสอบป้ายหน้าปั๊ม';
-      }
+        const response=await fetch(PRICE_API_URL,{headers:{Accept:'application/json'}});if(!response.ok)throw new Error('HTTP '+response.status);
+        const data=await response.json(),stations=data?.response?.stations;if(!stations)throw new Error('Invalid data');
+        const names={ptt:'ปตท.',bcp:'บางจาก',shell:'เชลล์',caltex:'คาลเท็กซ์',pt:'พีที',esso:'เอสโซ่ / Mobil'};livePrices={};
+        for(const [id,products]of Object.entries(stations)){if(!names[id])continue;const prices=Object.values(products).filter(p=>p?.name&&p?.price).map(p=>[p.name,Number(p.price)]).filter(p=>Number.isFinite(p[1])&&p[1]>0);if(prices.length)livePrices[id]={name:names[id],prices};}
+        if(!Object.keys(livePrices).length)throw new Error('No price list');
+        document.getElementById('price-date').textContent=data.response.date?`อัปเดตล่าสุด ${data.response.date}`:'ข้อมูลราคาล่าสุด';document.getElementById('price-source-note').textContent='Thai Oil API • ราคาขายปลีกอ้างอิงกรุงเทพฯ และปริมณฑล อาจต่างจากราคาหน้าสถานี';
+      }catch(error){livePrices=null;document.getElementById('price-date').textContent='ขณะนี้โหลดข้อมูลราคาไม่ได้';document.getElementById('price-source-note').textContent='ไม่แสดงราคาสำรองเพื่อป้องกันการเข้าใจว่าเป็นราคาปัจจุบัน';}
+      if(!document.getElementById('price-modal').classList.contains('hidden'))renderPriceModal();
     }
-
-    function openPriceModal(brand){
-      if(brand&&FALLBACK_BRANDS[brand]) selectedBrand=brand;
-      const modal=document.getElementById('price-modal'); modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.classList.add('modal-open');
-      renderPriceModal();
-    }
-
-    function closePriceModal(){ const m=document.getElementById('price-modal'); m.classList.add('hidden'); m.classList.remove('flex'); document.body.classList.remove('modal-open'); }
-
+    function openPriceModal(brand){if(brand&&livePrices?.[brand])selectedPriceBrand=brand;const modal=document.getElementById('price-modal');modal.classList.remove('hidden');modal.classList.add('flex');document.body.classList.add('modal-open');renderPriceModal();}
+    function closePriceModal(){const modal=document.getElementById('price-modal');modal.classList.add('hidden');modal.classList.remove('flex');document.body.classList.remove('modal-open');}
     function renderPriceModal(){
-      const source=liveBrands||FALLBACK_BRANDS;
-      document.getElementById('price-brand-tabs').innerHTML=Object.entries(source).map(([id,b])=>`
-        <button onclick="selectPriceBrand('${id}')" class="flex shrink-0 items-center gap-2 rounded-xl border px-3 py-2 text-sm ${selectedBrand===id?'border-blue-600 bg-blue-50 text-blue-700':'border-slate-200 bg-white text-slate-700'}">
-          ${brandMark(id,true)}<span>${b.name}</span>
-        </button>`).join('');
-      selectPriceBrand(selectedBrand);
+      const tabs=document.getElementById('price-brand-tabs'),rows=document.getElementById('price-rows');
+      if(!livePrices){tabs.innerHTML='';rows.innerHTML='<p class="px-4 py-8 text-center text-sm text-slate-500">ราคาน้ำมันยังไม่พร้อมใช้งาน กรุณาลองใหม่ภายหลัง</p>';document.getElementById('selected-price-brand').textContent='';document.getElementById('fuel-select').innerHTML='';calculateFuel();return;}
+      const entries=Object.entries(livePrices);if(!livePrices[selectedPriceBrand])selectedPriceBrand=entries[0][0];
+      tabs.innerHTML=entries.map(([id,b])=>`<button onclick="selectPriceBrand('${id}')" class="shrink-0 rounded-xl border px-3 py-2 text-sm ${id===selectedPriceBrand?'border-blue-600 bg-blue-50 text-blue-700':'border-slate-200 bg-white text-slate-700'}">${escapeHTML(b.name)}</button>`).join('');
+      selectPriceBrand(selectedPriceBrand);
     }
-
-    function selectPriceBrand(id){
-      const source=liveBrands||FALLBACK_BRANDS;
-      if(!source[id]) id=Object.keys(source)[0];
-      selectedBrand=id;
-      const b=source[id];
-      document.getElementById('selected-price-brand').textContent=b.name;
-      document.getElementById('price-rows').innerHTML=b.prices.map(([name,price])=>`
-        <button onclick="chooseFuel('${String(name).replace(/'/g,'&#39;')}',${price})" class="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-slate-50">
-          <span class="pr-3 text-sm text-slate-700">${name}</span><strong class="text-base text-slate-900">${Number(price).toFixed(2)}</strong>
-        </button>`).join('');
-      renderPriceModalTabs();
-      const first=b.prices[0]; if(first) chooseFuel(first[0],first[1]);
-    }
-
-    function renderPriceModalTabs(){
-      const source=liveBrands||FALLBACK_BRANDS;
-      document.querySelectorAll('#price-brand-tabs button').forEach((btn,i)=>{
-        const id=Object.keys(source)[i]; btn.classList.toggle('border-blue-600',id===selectedBrand); btn.classList.toggle('bg-blue-50',id===selectedBrand); btn.classList.toggle('text-blue-700',id===selectedBrand);
-      });
-    }
-
-    function chooseFuel(name,price){
-      const select=document.getElementById('fuel-select');
-      const options=Array.from(select.options); const found=options.find(o=>o.value===String(price));
-      if(!found){ select.innerHTML=''; select.appendChild(new Option(name,String(price))); } else select.value=String(price);
-      calculateFuel();
-    }
-
-    function setAmount(amount){ document.getElementById('amount-input').value=amount; calculateFuel(); }
-
-    function calculateFuel(){
-      const source=liveBrands||FALLBACK_BRANDS;
-      const b=source[selectedBrand];
-      const select=document.getElementById('fuel-select');
-      if(!select.options.length&&b) select.innerHTML=b.prices.map(([n,p])=>`<option value="${p}">${n}</option>`).join('');
-      const price=Number(select.value), amount=Number(document.getElementById('amount-input').value);
-      document.getElementById('liters-result').textContent=(price>0&&amount>0?(amount/price).toFixed(2):'0.00');
-    }
-
-    function showToast(message){ const t=document.getElementById('toast'); t.textContent=message; t.classList.remove('hidden'); clearTimeout(t._timer); t._timer=setTimeout(()=>t.classList.add('hidden'),3500); }
-
-    document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePriceModal(); });
-    generateStations(); renderBrands(); renderStations(); loadLivePrices();
+    function selectPriceBrand(id){if(!livePrices?.[id])return;selectedPriceBrand=id;const brand=livePrices[id];document.getElementById('selected-price-brand').textContent=brand.name;document.getElementById('price-brand-tabs').innerHTML=Object.entries(livePrices).map(([key,b])=>`<button onclick="selectPriceBrand('${key}')" class="shrink-0 rounded-xl border px-3 py-2 text-sm ${key===id?'border-blue-600 bg-blue-50 text-blue-700':'border-slate-200 bg-white text-slate-700'}">${escapeHTML(b.name)}</button>`).join('');document.getElementById('price-rows').innerHTML=brand.prices.map(([name,price],index)=>`<div class="flex items-center justify-between gap-3 px-4 py-3"><span class="text-sm text-slate-700">${escapeHTML(name)}</span><div class="flex items-center gap-3"><strong class="text-base text-slate-900">${price.toFixed(2)}</strong><button onclick="chooseFuel(${index})" class="rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-700">คำนวณ</button></div></div>`).join('');document.getElementById('fuel-select').innerHTML=brand.prices.map(([name,price])=>`<option value="${price}">${escapeHTML(name)}</option>`).join('');calculateFuel();}
+    function chooseFuel(index){const select=document.getElementById('fuel-select');select.selectedIndex=index;calculateFuel();}
+    function setAmount(amount){document.getElementById('amount-input').value=amount;calculateFuel();}
+    function calculateFuel(){const price=Number(document.getElementById('fuel-select').value),amount=Number(document.getElementById('amount-input').value);document.getElementById('liters-result').textContent=price>0&&amount>0?(amount/price).toFixed(2):'0.00';}
+    function showToast(message){const toast=document.getElementById('toast');toast.textContent=message;toast.classList.remove('hidden');clearTimeout(toast._timer);toast._timer=setTimeout(()=>toast.classList.add('hidden'),3500);}
+    document.addEventListener('keydown',event=>{if(event.key==='Escape')closePriceModal();});
+    renderBrands();loadStations();loadLivePrices();
   </script>
 </body>
 </html>
